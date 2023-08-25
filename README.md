@@ -33,3 +33,9 @@ end
 ---
 
 This plugin is still under construction, but it is working (I am already using it for everyday tasks).
+
+Inspired by:
+- https://github.com/jackMort/ChatGPT.nvim
+- https://github.com/wsdjeg/vim-chat
+- https://github.com/madox2/vim-ai/
+- https://github.com/CoderCookE/vim-chatgpt
