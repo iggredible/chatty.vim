@@ -3,6 +3,10 @@ function! helpers#windows#SetScratchWindow(win_file_type)
   let &l:ft=a:win_file_type
   let &l:bh='hide'
   setlocal noswapfile
+
+  if a:win_file_type == 'chatty_result'
+    let &l:modifiable=0
+  endif
 endfunction
 
 function! helpers#windows#CreateNewScratchWindow(scratch_buffer_name)

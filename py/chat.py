@@ -11,7 +11,9 @@ vim.command(f"py3file {root}/py/helpers/open_ai.py")
 def prepare_chat_result_window():
     vim.command('ChatResult')
     vim.command('normal! gg')
+    vim.command('setlocal modifiable')
     vim.command('%delete')
+    vim.command('setlocal nomodifiable')
 
 def openai_write_response(req, messages):
     prepare_chat_result_window()

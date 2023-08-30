@@ -33,6 +33,7 @@ def generate_openai_request(messages):
 
 def write_prompt_response(req):
     with urllib.request.urlopen(req) as response:
+        vim.command('setlocal modifiable')
         for line_bytes in response:
             line = line_bytes.decode("utf-8", errors="replace")
             if line.startswith(SSE_DATA_TEXT):
@@ -42,6 +43,7 @@ def write_prompt_response(req):
                 else:
                     openai_obj = json.loads(line_data)
                     handle_stream_response(openai_obj)
+    vim.command('setlocal nomodifiable')
 
 def handle_stream_response(openai_obj):
     delta_dict = openai_obj['choices'][0]['delta']
