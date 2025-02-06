@@ -1,30 +1,9 @@
 let s:root = expand('<sfile>:p:h:h')
 let s:chat_py = s:root . "/py/chat.py"
-
-function! chatty#RunResultWindow(scratch_buffer_name = 'chatty_result')
-  call helpers#windows#WindowFactory(a:scratch_buffer_name)
-endfunction
-
-function! chatty#RunPromptWindow(scratch_buffer_name = 'chatty_prompt')
-  call helpers#windows#WindowFactory(a:scratch_buffer_name)
-endfunction
-
-function! chatty#RunResultAndPromptWindows()
-  call chatty#RunResultWindow('chatty_result')
-  call chatty#RunPromptWindow('chatty_prompt')
-endfunction
-
-function! chatty#GetChatResponse()
-  let l:cursor_save = getpos('.')
-  let l:prompt_text = join(getline(1, '$'), "\n")
-  call setpos('.', l:cursor_save)
-
-  execute "py3file " . s:chat_py
-endfunction
-
-function! chatty#ChatOperator(type = '')
+"
+function! chatty#Operator(type = '')
   if a:type ==# ''
-    set opfunc=chatty#ChatOperator
+    set opfunc=chatty#Operator
     return 'g@'
   endif
 
@@ -42,8 +21,8 @@ function! chatty#ChatOperator(type = '')
 
     silent exe 'noautocmd keepjumps normal! ' .. get(l:commands, a:type, '')
 
+    " save the prompt_text
     let l:prompt_text = getreg('"')
-
     execute "py3file " . s:chat_py
   finally
 

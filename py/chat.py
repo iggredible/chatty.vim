@@ -1,29 +1,29 @@
 import vim
-import json
 import urllib.request
-import time
+import json
+import os
+from typing import Optional, Dict, Any
 
+# Load deps
 root = vim.eval("s:root")
-vim.command(f"py3file {root}/py/helpers/messages.py")
-vim.command(f"py3file {root}/py/helpers/open_ai.py")
+vim.command(f"py3file {root}/py/clients/open_ai.py")
 
-# start_time = time.time()
-def prepare_chat_result_window():
-    vim.command('ChatResult')
-    vim.command('normal! gg')
-    vim.command('setlocal modifiable')
-    vim.command('%delete')
-    vim.command('setlocal nomodifiable')
+print("HEYYY")
+def main():
 
-def openai_write_response(req, messages):
-    prepare_chat_result_window()
-    write_prompt_response(req)
-    add_to_messages(generate_current_result())
+    # Initialize client
+    client = OpenAIClient()
+    prompt = vim.eval('l:prompt_text') or 'What is the capital of Japan?'
 
-update_messages()
-messages_array = get_messages()
-chat_req = generate_openai_request(messages_array)
-openai_write_response(chat_req, messages_array)
+    try:
+        # TODO: create a parser
+        response = client.create_completion(prompt)
 
-# elapsed_time = time.time() - start_time
-# vim.command(f"normal! Go\n\n[ Time ellapsed: {elapsed_time}s ]")
+        message = response['choices'][0]['message']['content']
+        print(message)
+
+    except Exception as e:
+        print(f"Error: {e}")
+
+main()
+
