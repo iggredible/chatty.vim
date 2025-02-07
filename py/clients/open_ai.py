@@ -2,7 +2,7 @@
 class OpenAIClient:
     def __init__(
             self,
-            api_key: str = '',
+            api_key: str = 'YOUR_API_KEY',
             model: str = "gpt-3.5-turbo"
     ) -> None:
         """
@@ -22,7 +22,7 @@ class OpenAIClient:
 
     def create_completion(
         self,
-        prompt: str,
+        history: List[Dict[str, str]],
         max_tokens: int = 150,
         temperature: float = 0.7,
         top_p: float = 1.0,
@@ -33,7 +33,7 @@ class OpenAIClient:
         Send a completion request to OpenAI API.
 
         Args:
-            prompt: The prompt to send to the API
+            history: The history that is being sent to OpenAI
             max_tokens: Maximum number of tokens to generate
             temperature: Sampling temperature (0-2)
             top_p: Nucleus sampling parameter
@@ -51,7 +51,7 @@ class OpenAIClient:
 
         data = {
             "model": self.model,
-            "messages": [{"role": "user", "content": prompt}],
+            "messages": history,
             "max_tokens": max_tokens,
             "temperature": temperature,
             "top_p": top_p,
