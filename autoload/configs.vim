@@ -1,4 +1,7 @@
-function! configs#Init(init_content = 'You are a helpful assistant.')
+" TODO: instead of the persona 'You are a helpful assistant' from here, get it
+" from a file
+
+function! configs#Init(init_content = 'You are a helpful AI assistant. Any questions to create, update, or analyze code, respond with code only. Omit explanations.')
   let g:chatty_prompt = ''
   let g:chatty_response = ''
 

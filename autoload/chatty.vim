@@ -24,8 +24,6 @@ function! chatty#Operator(type = '')
     " save the prompt_text inside g:chatty_prompt
     let l:chatty_prompt = getreg('"')
     call chatty#Execute(l:chatty_prompt)
-    " call chatty#SetResponse()
-    " call chatty#PushHistory()
   finally
 
     " restore inits
@@ -45,21 +43,15 @@ function! chatty#Execute(prompt = '')
   " set prompt
   let g:chatty_prompt = a:prompt
 
-  " Update history
-  let l:history = json_decode(g:chatty_history)
-  let l:prompt = { 'role': 'user', 'content': g:chatty_prompt }
-  let l:history += [l:prompt]
-  let g:chatty_history = json_encode(l:history)
+  " Push prompt into history
+  call chatty#UpdateHistory('prompt')
 
-  " Call Client
+  " Asks chat client
   " Sets g:chatty_response
   call chatty#SetResponse()
 
-  " Update history
-  let l:history = json_decode(g:chatty_history)
-  let l:response = { 'role': 'assistant', 'content': g:chatty_response }
-  let l:history += [l:response]
-  let g:chatty_history = json_encode(l:history)
+  " Push response into history
+  call chatty#UpdateHistory('response')
 endfunction
 
 " The python file sets g:chatty_response
@@ -67,14 +59,18 @@ function! chatty#SetResponse()
   execute "py3file " . s:chat_py
 endfunction
 
-" Append the prompt and response into history
-" function! chatty#PushHistory(history = {})
-"   let l:history = json_decode(g:chatty_history)
-"   let l:prompt = { 'role': 'user', 'content': g:chatty_prompt }
-"   let l:response = { 'role': 'assistant', 'content': g:chatty_response }
-"
-"   let l:history += [l:prompt]
-"   let l:history += [l:response]
-"
-"   let g:chatty_history = json_encode(l:history)
-" endfunction
+" types are either 'prompt' for user questions or 'response' for chat response
+function! chatty#UpdateHistory(type = '')
+  let l:history = json_decode(g:chatty_history)
+
+  if a:type == 'prompt'
+    let l:prompt = { 'role': 'user', 'content': g:chatty_prompt }
+    let l:history += [l:prompt]
+  elseif a:type == 'response'
+    let l:response = { 'role': 'assistant', 'content': g:chatty_response }
+    let l:history += [l:response]
+  endif
+
+  let g:chatty_history = json_encode(l:history)
+  " TODO: update .chatty/open_ai/histories/persona_name__TIMESTAMP__chat.txt
+endfunction
