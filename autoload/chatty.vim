@@ -74,3 +74,76 @@ function! chatty#UpdateHistory(type = '')
   let g:chatty_history = json_encode(l:history)
   " TODO: update .chatty/open_ai/histories/persona_name__TIMESTAMP__chat.txt
 endfunction
+
+function! chatty#SetContext(context)
+  let g:chatty_context = a:context
+  let g:chatty_context_path = g:chatty_context_base_path .. a:context .. '.json'
+endfunction
+
+function! chatty#GetContexts() abort
+  let l:context_dir = '.' .. g:chatty_context_base_path
+  
+  if !isdirectory(l:context_dir)
+    return []
+  endif
+  
+  " Get list of all files with .json extension
+  let l:files = glob(l:context_dir . '/*.json', 0, 1)
+  
+  " Extract just the filenames without extension
+  return map(l:files, 'fnamemodify(v:val, ":t:r")')
+endfunction
+
+function! chatty#LoadContext(context_path)
+  let l:script_dir = expand('<sfile>:p:h') 
+  let l:plugin_root = fnamemodify(l:script_dir, ':h')
+  let l:json_file = l:plugin_root . a:context_path
+
+  try
+      let l:json_content = join(readfile(l:json_file), '')
+      return json_decode(l:json_content)
+  catch
+      echohl ErrorMsg
+      echo "Failed to read config file: " .. v:exception .. '. Will be using a default context.'
+      return { 'role': 'system', 'content': 'You are a helpful AI assistant.' }
+  endtry
+endfunction
+
+function! chatty#ListContexts(text = '')
+  let l:list = chatty#GetContexts()
+
+  function! PopupCallback(id, result) closure
+    if a:result != -1
+      let l:context = l:list[a:result-1]
+      " TODO: instead of execute, call SetContext, 
+      call chatty#SetContext(l:context)
+    endif
+  endfunction
+
+  let cursor_pos = screenpos(win_getid(), line('.'), col('.'))
+  let screen_row = cursor_pos.row
+  let screen_col = cursor_pos.col
+  let total_height = &lines
+  let space_below = total_height - screen_row
+  let needed_height = len(l:list)
+
+  let options = get(g:, 'operatorify_options', {
+        \ 'callback': 'PopupCallback',
+        \ 'border': [],
+        \ 'padding': [0,1,0,1],
+        \ 'pos': 'topleft',
+        \ 'moved': [0, 0, 0],
+        \ 'scrollbar': 0,
+        \ 'fixed': 1
+        \ })
+
+  if space_below < needed_height
+    let options.line = cursor_pos.row - needed_height
+    let options.pos = 'botleft'
+  else
+    let options.line = screen_row + 1
+  endif
+
+  let options.col = screen_col
+  let winid = popup_menu(l:list, options)
+endfunction
