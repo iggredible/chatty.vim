@@ -1,4 +1,4 @@
-call configs#Init()
+call config#Init()
 
 nnoremap <expr> ch chatty#Operator()
 xnoremap <expr> ch chatty#Operator()
