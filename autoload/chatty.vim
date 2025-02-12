@@ -75,13 +75,10 @@ function! chatty#UpdateHistory(type = '')
   " TODO: update .chatty/open_ai/histories/persona_name__TIMESTAMP__chat.txt
 endfunction
 
-function! chatty#SetContext(context)
-  let g:chatty_context = a:context
-  let g:chatty_context_path = g:chatty_context_base_path .. a:context .. '.json'
-endfunction
-
 function! chatty#GetContexts() abort
-  let l:context_dir = '.' .. g:chatty_context_base_path
+  " TODO this is incorrect.
+  " Somehow g:chatty_abs_path went from including chatty.vim to excluding it
+  let l:context_dir = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/contexts/open_ai')
   
   if !isdirectory(l:context_dir)
     return []
@@ -94,10 +91,9 @@ function! chatty#GetContexts() abort
   return map(l:files, 'fnamemodify(v:val, ":t:r")')
 endfunction
 
+" Return { 'role': 'system', 'context': 'You are a helpful ai assistant' }
 function! chatty#LoadContext(context_path)
-  let l:script_dir = expand('<sfile>:p:h') 
-  let l:plugin_root = fnamemodify(l:script_dir, ':h')
-  let l:json_file = l:plugin_root . a:context_path
+  let l:json_file = simplify(a:context_path)
 
   try
       let l:json_content = join(readfile(l:json_file), '')
@@ -115,8 +111,9 @@ function! chatty#ListContexts(text = '')
   function! PopupCallback(id, result) closure
     if a:result != -1
       let l:context = l:list[a:result-1]
-      " TODO: instead of execute, call SetContext, 
-      call chatty#SetContext(l:context)
+      call config#SetContext(l:context)
+      " let l:content = chatty#LoadContext(g:chatty_context_path) 
+      " let g:chatty_history = json_encode(add([], l:content))
     endif
   endfunction
 
