@@ -1,0 +1,1 @@
+{"id":"history1","name":"history1","history":[{"role":"system","content":"You are a helpful AI assistant. Any questions to create, update, or analyze code, respond with code only. Omit explanations."},{"role":"user","content":"What is the capital of Brazil?\n"},{"role":"assistant","content":"```python\ncapital_of_brazil = \"Brasília\"\n```"}]}

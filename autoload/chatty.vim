@@ -39,6 +39,9 @@ function! chatty#Operator(type = '')
   return
 endfunction
 
+" Hardcoding for now
+let g:chatty_history_id = 'history1'
+
 function! chatty#Execute(prompt = '')
   " set prompt
   let g:chatty_prompt = a:prompt
@@ -52,6 +55,45 @@ function! chatty#Execute(prompt = '')
 
   " Push response into history
   call chatty#UpdateHistory('response')
+
+  " TODO: create_or_update_history
+  if exists('g:chatty_history_id')
+    let l:history_file = chatty#GetHistoryFile()
+    call chatty#UpdateHistoryFileHistory(l:history_file)
+  else
+    " Create a new one. 
+    " Generate a random UUID as the ID. 
+    " set g:chatty_history_id value with the UUID value
+    " Name it .chatty/histories/open_ai/assistant__TIMESTAMP.json
+    " Write in it the id and g:chatty_history as history
+  endif
+endfunction
+
+function! chatty#UpdateHistoryFileHistory(history_file)
+  let l:content = join(readfile(a:history_file), '')
+    
+    try
+      let l:json_content = json_decode(l:content)
+      let l:json_content.history = json_decode(g:chatty_history)
+      
+      " Write the updated content back to file
+      call writefile([json_encode(l:json_content)], a:history_file)
+      
+      return l:json_content
+    catch
+      throw 'Invalid JSON in history file ' .. g:chatty_history_id .. '.json'
+    endtry
+endfunction
+
+function! chatty#GetHistoryFile()
+  let l:chatty_abs_histories_path = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/histories/open_ai')
+  let l:history_file = l:chatty_abs_histories_path .. '/' .. g:chatty_history_id .. '.json'
+  
+  if !filereadable(l:history_file)
+    throw 'No history file ' .. g:chatty_history_id .. '.json found'
+  endif
+
+  return l:history_file
 endfunction
 
 " The python file sets g:chatty_response
@@ -143,4 +185,8 @@ function! chatty#ListContexts(text = '')
 
   let options.col = screen_col
   let winid = popup_menu(l:list, options)
+endfunction
+
+function! chatty#GenerateUUID()
+  py3 import uuid; print(uuid.uuid4())
 endfunction
