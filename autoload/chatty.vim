@@ -112,8 +112,8 @@ function! chatty#ListContexts(text = '')
     if a:result != -1
       let l:context = l:list[a:result-1]
       call config#SetContext(l:context)
-      " let l:content = chatty#LoadContext(g:chatty_context_path) 
-      " let g:chatty_history = json_encode(add([], l:content))
+      let l:content = chatty#LoadContext(g:chatty_context_path)
+      let g:chatty_history = json_encode(add([], l:content))
     endif
   endfunction
 
