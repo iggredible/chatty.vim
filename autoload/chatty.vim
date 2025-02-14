@@ -40,7 +40,8 @@ function! chatty#Operator(type = '')
 endfunction
 
 " Hardcoding for now
-let g:chatty_history_id = 'history1'
+" TODO: remove this
+" let g:chatty_history_id = 'history1'
 
 function! chatty#Execute(prompt = '')
   " set prompt
@@ -56,17 +57,33 @@ function! chatty#Execute(prompt = '')
   " Push response into history
   call chatty#UpdateHistory('response')
 
-  " TODO: create_or_update_history
   if exists('g:chatty_history_id')
     let l:history_file = chatty#GetHistoryFile()
     call chatty#UpdateHistoryFileHistory(l:history_file)
   else
-    " Create a new one. 
-    " Generate a random UUID as the ID. 
-    " set g:chatty_history_id value with the UUID value
-    " Name it .chatty/histories/open_ai/assistant__TIMESTAMP.json
-    " Write in it the id and g:chatty_history as history
+    let g:chatty_history_id = chatty#GenerateUUID()
+
+    let l:chatty_abs_histories_path = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/histories/open_ai')
+    let l:history_file = l:chatty_abs_histories_path .. '/' .. g:chatty_history_id .. '.json'
+    call chatty#CreateHistoryFile(l:history_file)
+    call chatty#UpdateHistoryFileHistory(l:history_file)
   endif
+endfunction
+
+function! chatty#CreateHistoryFile(history_file)
+  let l:content = [
+    \ '{',
+    \ '  "id": "' . g:chatty_history_id . '",',
+    \ '  "name": "' . g:chatty_history_id . '",',
+    \ '  "history": []',
+    \ '}',
+    \ '',
+    \ ''
+    \ ] 
+
+  let l:dir = fnamemodify(a:history_file, ':h')
+  call mkdir(l:dir, 'p')
+  call writefile(l:content, a:history_file)
 endfunction
 
 function! chatty#UpdateHistoryFileHistory(history_file)
@@ -118,8 +135,6 @@ function! chatty#UpdateHistory(type = '')
 endfunction
 
 function! chatty#GetContexts() abort
-  " TODO this is incorrect.
-  " Somehow g:chatty_abs_path went from including chatty.vim to excluding it
   let l:context_dir = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/contexts/open_ai')
   
   if !isdirectory(l:context_dir)
@@ -156,6 +171,11 @@ function! chatty#ListContexts(text = '')
       call config#SetContext(l:context)
       let l:content = chatty#LoadContext(g:chatty_context_path)
       let g:chatty_history = json_encode(add([], l:content))
+
+      " Start a new session if we change context
+      if exists('g:chatty_history_id')
+        unlet g:chatty_history_id
+      endif
     endif
   endfunction
 
@@ -188,5 +208,5 @@ function! chatty#ListContexts(text = '')
 endfunction
 
 function! chatty#GenerateUUID()
-  py3 import uuid; print(uuid.uuid4())
+  return py3eval('__import__("uuid").uuid4().__str__()')
 endfunction
