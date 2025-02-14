@@ -39,10 +39,6 @@ function! chatty#Operator(type = '')
   return
 endfunction
 
-" Hardcoding for now
-" TODO: remove this
-" let g:chatty_history_id = 'history1'
-
 function! chatty#Execute(prompt = '')
   " set prompt
   let g:chatty_prompt = a:prompt
@@ -61,13 +57,16 @@ function! chatty#Execute(prompt = '')
     let l:history_file = chatty#GetHistoryFile()
     call chatty#UpdateHistoryFileHistory(l:history_file)
   else
-    let g:chatty_history_id = chatty#GenerateUUID()
-
-    let l:chatty_abs_histories_path = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/histories/open_ai')
-    let l:history_file = l:chatty_abs_histories_path .. '/' .. g:chatty_history_id .. '.json'
-    call chatty#CreateHistoryFile(l:history_file)
-    call chatty#UpdateHistoryFileHistory(l:history_file)
+    call chatty#CreateNewHistory()
   endif
+endfunction
+
+function! chatty#CreateNewHistory()
+  let g:chatty_history_id = chatty#GenerateUUID()
+  let l:chatty_abs_histories_path = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/histories/open_ai')
+  let l:history_file = l:chatty_abs_histories_path .. '/' .. g:chatty_history_id .. '.json'
+  call chatty#CreateHistoryFile(l:history_file)
+  call chatty#UpdateHistoryFileHistory(l:history_file)
 endfunction
 
 function! chatty#CreateHistoryFile(history_file)
@@ -84,22 +83,6 @@ function! chatty#CreateHistoryFile(history_file)
   let l:dir = fnamemodify(a:history_file, ':h')
   call mkdir(l:dir, 'p')
   call writefile(l:content, a:history_file)
-endfunction
-
-function! chatty#UpdateHistoryFileHistory(history_file)
-  let l:content = join(readfile(a:history_file), '')
-    
-    try
-      let l:json_content = json_decode(l:content)
-      let l:json_content.history = json_decode(g:chatty_history)
-      
-      " Write the updated content back to file
-      call writefile([json_encode(l:json_content)], a:history_file)
-      
-      return l:json_content
-    catch
-      throw 'Invalid JSON in history file ' .. g:chatty_history_id .. '.json'
-    endtry
 endfunction
 
 function! chatty#GetHistoryFile()
@@ -209,4 +192,39 @@ endfunction
 
 function! chatty#GenerateUUID()
   return py3eval('__import__("uuid").uuid4().__str__()')
+endfunction
+
+function! chatty#UpdateHistoryFileHistory(history_file)
+  let l:content = join(readfile(a:history_file), '')
+
+    try
+      let l:json_content = json_decode(l:content)
+      let l:json_content.history = json_decode(g:chatty_history)
+
+      call writefile([json_encode(l:json_content)], a:history_file)
+
+      return l:json_content
+    catch
+      throw 'Invalid JSON in history file ' .. g:chatty_history_id .. '.json'
+    endtry
+endfunction
+
+function! chatty#RenameHistory(name)
+  if !exists('g:chatty_history_id')
+    call chatty#CreateNewHistory()
+  endif
+
+  " Find history file
+  let l:history_file = chatty#GetHistoryFile()
+
+  " Update name
+  let l:content = join(readfile(l:history_file), '')
+    try
+      let l:json_content = json_decode(l:content)
+      let l:json_content.name = a:name
+
+      call writefile([json_encode(l:json_content)], l:history_file)
+    catch
+      throw 'Invalid JSON in history file ' .. g:chatty_history_id .. '.json'
+    endtry
 endfunction
