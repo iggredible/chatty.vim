@@ -74,6 +74,7 @@ function! chatty#CreateHistoryFile(history_file)
     \ '{',
     \ '  "id": "' . g:chatty_history_id . '",',
     \ '  "name": "' . g:chatty_history_id . '",',
+    \ '  "context": "' . g:chatty_context . '",',
     \ '  "history": []',
     \ '}',
     \ '',
@@ -200,7 +201,7 @@ function! chatty#UpdateHistoryFileHistory(history_file)
     try
       let l:json_content = json_decode(l:content)
       let l:json_content.history = json_decode(g:chatty_history)
-      " let l:json_content.context = json_decode(g:chatty_context)
+      let l:json_content.context = g:chatty_context
 
       call writefile([json_encode(l:json_content)], a:history_file)
 

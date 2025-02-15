@@ -1,6 +1,7 @@
 {
   "id": "history2",
   "name": "Mathy",
+  "context": "assistant",
   "history": [
     {"role":"system","content":"You are a helpful AI assistant."},
     {"role":"user","content":"What is 1 + 1?"},
