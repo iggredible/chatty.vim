@@ -145,7 +145,7 @@ function! chatty#LoadContext(context_path)
   endtry
 endfunction
 
-function! chatty#ListContexts(text = '')
+function! chatty#ListContexts()
   let l:list = chatty#GetContexts()
 
   function! PopupCallback(id, result) closure
@@ -200,6 +200,7 @@ function! chatty#UpdateHistoryFileHistory(history_file)
     try
       let l:json_content = json_decode(l:content)
       let l:json_content.history = json_decode(g:chatty_history)
+      " let l:json_content.context = json_decode(g:chatty_context)
 
       call writefile([json_encode(l:json_content)], a:history_file)
 
@@ -207,6 +208,38 @@ function! chatty#UpdateHistoryFileHistory(history_file)
     catch
       throw 'Invalid JSON in history file ' .. g:chatty_history_id .. '.json'
     endtry
+endfunction
+
+function! chatty#GetHistories()
+  let l:context_dir = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/histories/open_ai')
+  
+  if !isdirectory(l:context_dir)
+    return []
+  endif
+  
+  " Get list of all files with .json extension
+  let l:files = glob(l:context_dir . '/*.json', 0, 1)
+  let l:result = []
+
+  " Read each JSON file and extract name and id
+  for l:file in l:files
+    let l:content = readfile(l:file)
+    if !empty(l:content)
+      try
+        let l:json = json_decode(join(l:content, ''))
+        let l:name = get(l:json, 'name', '')
+        let l:id = get(l:json, 'id', '')
+        if !empty(l:name) && !empty(l:id)
+          call add(l:result, l:name .. ' - ' .. l:id)
+        endif
+      catch
+        " Skip invalid JSON files
+        continue
+      endtry
+    endif
+  endfor
+
+  return l:result
 endfunction
 
 function! chatty#RenameHistory(name)
