@@ -44,14 +44,14 @@ function! chatty#Execute(prompt = '')
   let g:chatty_prompt = a:prompt
 
   " Push prompt into history
-  call chatty#UpdateHistory('prompt')
+  call chatty#PushHistory('prompt')
 
   " Asks chat client
   " Sets g:chatty_response
   call chatty#SetResponse()
 
   " Push response into history
-  call chatty#UpdateHistory('response')
+  call chatty#PushHistory('response')
 
   if exists('g:chatty_history_id')
     let l:history_file = chatty#GetHistoryFile()
@@ -86,12 +86,12 @@ function! chatty#CreateHistoryFile(history_file)
   call writefile(l:content, a:history_file)
 endfunction
 
-function! chatty#GetHistoryFile()
+function! chatty#GetHistoryFile(history_id = g:chatty_history_id)
   let l:chatty_abs_histories_path = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/histories/open_ai')
-  let l:history_file = l:chatty_abs_histories_path .. '/' .. g:chatty_history_id .. '.json'
+  let l:history_file = l:chatty_abs_histories_path .. '/' .. a:history_id .. '.json'
   
   if !filereadable(l:history_file)
-    throw 'No history file ' .. g:chatty_history_id .. '.json found'
+    throw 'No history file ' .. a:history_id .. '.json found'
   endif
 
   return l:history_file
@@ -103,7 +103,7 @@ function! chatty#SetResponse()
 endfunction
 
 " types are either 'prompt' for user questions or 'response' for chat response
-function! chatty#UpdateHistory(type = '')
+function! chatty#PushHistory(type = '')
   let l:history = json_decode(g:chatty_history)
 
   if a:type == 'prompt'
@@ -211,6 +211,26 @@ function! chatty#UpdateHistoryFileHistory(history_file)
     endtry
 endfunction
 
+function! chatty#RenameHistory(name)
+  if !exists('g:chatty_history_id')
+    call chatty#CreateNewHistory()
+  endif
+
+  " Find history file
+  let l:history_file = chatty#GetHistoryFile()
+
+  " Update name
+  let l:content = join(readfile(l:history_file), '')
+    try
+      let l:json_content = json_decode(l:content)
+      let l:json_content.name = a:name
+
+      call writefile([json_encode(l:json_content)], l:history_file)
+    catch
+      throw 'Invalid JSON in history file ' .. g:chatty_history_id .. '.json'
+    endtry
+endfunction
+
 function! chatty#GetHistories()
   let l:context_dir = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/histories/open_ai')
   
@@ -231,7 +251,7 @@ function! chatty#GetHistories()
         let l:name = get(l:json, 'name', '')
         let l:id = get(l:json, 'id', '')
         if !empty(l:name) && !empty(l:id)
-          call add(l:result, l:name .. ' - ' .. l:id)
+          call add(l:result, l:name .. '__' .. l:id)
         endif
       catch
         " Skip invalid JSON files
@@ -243,22 +263,57 @@ function! chatty#GetHistories()
   return l:result
 endfunction
 
-function! chatty#RenameHistory(name)
-  if !exists('g:chatty_history_id')
-    call chatty#CreateNewHistory()
+function! chatty#ListHistories()
+  let l:list = chatty#GetHistories()
+
+  function! PopupCallback(id, result) closure
+    if a:result != -1
+      let l:history_name_id = l:list[a:result-1]
+      let [l:history_name, l:history_id] = split(l:history_name_id, '__')
+
+      call chatty#UpdateHistory(l:history_id)
+    endif
+  endfunction
+
+  let cursor_pos = screenpos(win_getid(), line('.'), col('.'))
+  let screen_row = cursor_pos.row
+  let screen_col = cursor_pos.col
+  let total_height = &lines
+  let space_below = total_height - screen_row
+  let needed_height = len(l:list)
+
+  let options = get(g:, 'operatorify_options', {
+        \ 'callback': 'PopupCallback',
+        \ 'border': [],
+        \ 'padding': [0,1,0,1],
+        \ 'pos': 'topleft',
+        \ 'moved': [0, 0, 0],
+        \ 'scrollbar': 0,
+        \ 'fixed': 1
+        \ })
+
+  if space_below < needed_height
+    let options.line = cursor_pos.row - needed_height
+    let options.pos = 'botleft'
+  else
+    let options.line = screen_row + 1
   endif
 
-  " Find history file
-  let l:history_file = chatty#GetHistoryFile()
+  let options.col = screen_col
+  let winid = popup_menu(l:list, options)
+endfunction
 
-  " Update name
-  let l:content = join(readfile(l:history_file), '')
-    try
-      let l:json_content = json_decode(l:content)
-      let l:json_content.name = a:name
-
-      call writefile([json_encode(l:json_content)], l:history_file)
-    catch
-      throw 'Invalid JSON in history file ' .. g:chatty_history_id .. '.json'
-    endtry
+function! chatty#UpdateHistory(history_id)
+  let l:chatty_abs_histories_path = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/histories/open_ai')
+  let l:history_file_path = l:chatty_abs_histories_path .. '/' .. a:history_id .. '.json'
+  try
+    let l:json_content = join(readfile(l:history_file_path), '')
+    let l:content = json_decode(l:json_content)
+    let l:content_history = content.history
+    let g:chatty_history = l:content_history
+    let g:chatty_history_id = l:content.id
+    echom 'History updated!'
+  catch
+    throw 'Invalid JSON in history file ' .. a:history_id .. '.json'
+  endtry
 endfunction
