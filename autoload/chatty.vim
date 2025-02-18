@@ -63,7 +63,7 @@ endfunction
 
 function! chatty#CreateNewHistory()
   let g:chatty_history_id = chatty#GenerateUUID()
-  let l:chatty_abs_histories_path = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/histories/open_ai')
+  let l:chatty_abs_histories_path = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/histories/' .. g:chatty_provider)
   let l:history_file = l:chatty_abs_histories_path .. '/' .. g:chatty_history_id .. '.json'
   call chatty#CreateHistoryFile(l:history_file)
   call chatty#UpdateHistoryFileHistory(l:history_file)
@@ -87,7 +87,7 @@ function! chatty#CreateHistoryFile(history_file)
 endfunction
 
 function! chatty#GetHistoryFile(history_id = g:chatty_history_id)
-  let l:chatty_abs_histories_path = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/histories/open_ai')
+  let l:chatty_abs_histories_path = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/histories/' .. g:chatty_provider)
   let l:history_file = l:chatty_abs_histories_path .. '/' .. a:history_id .. '.json'
   
   if !filereadable(l:history_file)
@@ -115,11 +115,10 @@ function! chatty#PushHistory(type = '')
   endif
 
   let g:chatty_history = json_encode(l:history)
-  " TODO: update .chatty/open_ai/histories/persona_name__TIMESTAMP__chat.txt
 endfunction
 
 function! chatty#GetContexts() abort
-  let l:context_dir = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/contexts/open_ai')
+  let l:context_dir = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/contexts/' .. g:chatty_provider)
   
   if !isdirectory(l:context_dir)
     return []
@@ -232,7 +231,7 @@ function! chatty#RenameHistory(name)
 endfunction
 
 function! chatty#GetHistories()
-  let l:context_dir = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/histories/open_ai')
+  let l:context_dir = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/histories/' .. g:chatty_provider)
   
   if !isdirectory(l:context_dir)
     return []
@@ -304,7 +303,7 @@ function! chatty#ListHistories()
 endfunction
 
 function! chatty#UpdateHistory(history_id)
-  let l:chatty_abs_histories_path = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/histories/open_ai')
+  let l:chatty_abs_histories_path = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/histories/' .. g:chatty_provider)
   let l:history_file_path = l:chatty_abs_histories_path .. '/' .. a:history_id .. '.json'
   try
     let l:json_content = join(readfile(l:history_file_path), '')

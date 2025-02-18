@@ -6,7 +6,8 @@ from typing import Optional, Dict, List, Any
 
 # Load deps
 root = vim.eval("s:root")
-vim.command(f"py3file {root}/py/clients/open_ai.py")
+provider = vim.eval("g:chatty_provider")
+vim.command(f"py3file {root}/py/clients/{provider}.py")
 
 def main():
     client = OpenAIClient()
