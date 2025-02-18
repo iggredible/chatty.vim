@@ -310,7 +310,7 @@ function! chatty#UpdateHistory(history_id)
     let l:json_content = join(readfile(l:history_file_path), '')
     let l:content = json_decode(l:json_content)
     let l:content_history = content.history
-    let g:chatty_history = l:content_history
+    let g:chatty_history = json_encode(l:content_history)
     let g:chatty_history_id = l:content.id
     echom 'History updated!'
   catch
