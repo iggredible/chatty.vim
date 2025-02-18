@@ -15,16 +15,16 @@
 
 call config#Init()
 
-nnoremap <expr> ch chatty#Operator()
-xnoremap <expr> ch chatty#Operator()
-nnoremap <expr> chh chatty#Operator() .. '_'
+nnoremap <expr> ch helper#Operator()
+xnoremap <expr> ch helper#Operator()
+nnoremap <expr> chh helper#Operator() .. '_'
 
 " Add <leader>cc
-command! ChattyContexts call chatty#ListContexts()
-nnoremap <Leader>cc :ChattyContexts<CR>
+command! ChattyContextsPopup call context#Popup()
+nnoremap <Leader>cc :ChattyContextsPopup<CR>
 
-command! ChattyRenameHistory let name = input('Enter a new name: ') | call chatty#RenameHistory(name)
+command! ChattyRenameHistory let name = input('Enter a new name: ') | call history#Rename(name)
 nnoremap <Leader>cr :ChattyRenameHistory<CR>
 
-command! ChattyHistories call chatty#ListHistories()
-nnoremap <Leader>ch :ChattyHistories<CR>
+command! ChattyHistoriesPopup call history#Popup()
+nnoremap <Leader>ch :ChattyHistoriesPopup<CR>

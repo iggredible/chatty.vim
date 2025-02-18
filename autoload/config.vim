@@ -5,7 +5,7 @@ function! config#Init()
   let g:chatty_prompt = ''
   let g:chatty_response = ''
   call config#SetContext('default_assistant')
-  let l:content = chatty#LoadContext(g:chatty_context_path)
+  let l:content = context#Fetch(g:chatty_context_path)
   call config#SetHistory(l:content)
 endfunction
 
