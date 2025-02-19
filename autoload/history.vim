@@ -117,44 +117,10 @@ function! history#List()
   return l:result
 endfunction
 
-function! history#Popup()
-  let l:list = history#List()
+function! history#PopupCallBack(history_name_id)
+  let [l:history_name, l:history_id] = split(a:history_name_id, '__')
 
-  function! PopupCallback(id, result) closure
-    if a:result != -1
-      let l:history_name_id = l:list[a:result-1]
-      let [l:history_name, l:history_id] = split(l:history_name_id, '__')
-
-      call history#Update(l:history_id)
-    endif
-  endfunction
-
-  let cursor_pos = screenpos(win_getid(), line('.'), col('.'))
-  let screen_row = cursor_pos.row
-  let screen_col = cursor_pos.col
-  let total_height = &lines
-  let space_below = total_height - screen_row
-  let needed_height = len(l:list)
-
-  let options = get(g:, 'operatorify_options', {
-        \ 'callback': 'PopupCallback',
-        \ 'border': [],
-        \ 'padding': [0,1,0,1],
-        \ 'pos': 'topleft',
-        \ 'moved': [0, 0, 0],
-        \ 'scrollbar': 0,
-        \ 'fixed': 1
-        \ })
-
-  if space_below < needed_height
-    let options.line = cursor_pos.row - needed_height
-    let options.pos = 'botleft'
-  else
-    let options.line = screen_row + 1
-  endif
-
-  let options.col = screen_col
-  let winid = popup_menu(l:list, options)
+  call history#Update(l:history_id)
 endfunction
 
 function! history#Update(history_id)

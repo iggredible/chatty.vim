@@ -14,17 +14,14 @@
 " g:chatty_provider: AI client provider, ex: 'open_ai' (String)
 
 call config#Init()
+call helper#OperatorMapper('ch', 'chatty#Execute')
 
-nnoremap <expr> ch helper#Operator()
-xnoremap <expr> ch helper#Operator()
-nnoremap <expr> chh helper#Operator() .. '_'
-
-" Add <leader>cc
-command! ChattyContextsPopup call context#Popup()
+command! ChattyContextsPopup call helper#Popup('context#List', 'context#PopupCallBack')
 nnoremap <Leader>cc :ChattyContextsPopup<CR>
 
 command! ChattyRenameHistory let name = input('Enter a new name: ') | call history#Rename(name)
 nnoremap <Leader>cr :ChattyRenameHistory<CR>
 
-command! ChattyHistoriesPopup call history#Popup()
+" command! ChattyHistoriesPopup call history#Popup()
+command! ChattyHistoriesPopup call helper#Popup('history#List', 'history#PopupCallBack')
 nnoremap <Leader>ch :ChattyHistoriesPopup<CR>

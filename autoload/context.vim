@@ -26,49 +26,13 @@ function! context#Fetch(context_path)
   endtry
 endfunction
 
-function! context#Popup()
-  let l:list = context#List()
+function! context#PopupCallBack(context)
+    call config#SetContext(a:context)
+    let l:context_history = context#Fetch(g:chatty_context_path)
+    let g:chatty_history = json_encode(add([], l:context_history))
 
-  function! PopupCallback(id, result) closure
-    if a:result != -1
-      let l:context = l:list[a:result-1]
-      call config#SetContext(l:context)
-      let l:content = context#Fetch(g:chatty_context_path)
-      let g:chatty_history = json_encode(add([], l:content))
-
-      " Start a new session if we change context
-      if exists('g:chatty_history_id')
-        unlet g:chatty_history_id
-      endif
+    " Start a new session if we change context
+    if exists('g:chatty_history_id')
+      unlet g:chatty_history_id
     endif
-  endfunction
-
-  let cursor_pos = screenpos(win_getid(), line('.'), col('.'))
-  let screen_row = cursor_pos.row
-  let screen_col = cursor_pos.col
-  let total_height = &lines
-  let space_below = total_height - screen_row
-  let needed_height = len(l:list)
-
-  let options = get(g:, 'operatorify_options', {
-        \ 'callback': 'PopupCallback',
-        \ 'border': [],
-        \ 'padding': [0,1,0,1],
-        \ 'pos': 'topleft',
-        \ 'moved': [0, 0, 0],
-        \ 'scrollbar': 0,
-        \ 'fixed': 1
-        \ })
-
-  if space_below < needed_height
-    let options.line = cursor_pos.row - needed_height
-    let options.pos = 'botleft'
-  else
-    let options.line = screen_row + 1
-  endif
-
-  let options.col = screen_col
-  let winid = popup_menu(l:list, options)
 endfunction
-
-
