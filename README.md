@@ -7,7 +7,7 @@ ChatGPT plugin for Vim.
 Add your OpenAI key in env
 
 ```
-export OPENAI_KEY=YOUR_OPENAI_KEY
+export OPENAI_API_KEY=YOUR_OPENAI_KEY
 ```
 
 ## Usage 1 (Prompt)

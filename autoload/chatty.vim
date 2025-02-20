@@ -26,5 +26,11 @@ function! chatty#Execute(prompt = '')
   else
     call history#Create()
   endif
+
+  call chatty#WriteResponse(g:chatty_response)
+endfunction
+
+function! chatty#WriteResponse(response)
+  put =a:response
 endfunction
 
