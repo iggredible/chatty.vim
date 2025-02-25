@@ -6,10 +6,7 @@ function! chatty#SetResponse()
   execute "py3file " . s:chat_py
 endfunction
 
-function! chatty#Execute(prompt = '')
-  " set prompt
-  let g:chatty_prompt = a:prompt
-
+function! chatty#BuildHistory()
   " Push prompt into history
   call history#Push('prompt')
 
@@ -26,11 +23,25 @@ function! chatty#Execute(prompt = '')
   else
     call history#Create()
   endif
-
-  call chatty#WriteResponse(g:chatty_response)
 endfunction
 
-function! chatty#WriteResponse(response)
+function! chatty#Ask(prompt = '')
+  let g:chatty_prompt = a:prompt
+
+  call chatty#BuildHistory()
+  call chatty#PutResponse(g:chatty_response)
+endfunction
+
+function! chatty#PutResponse(response)
   put =a:response
 endfunction
 
+function! chatty#Process(prompt = '')
+  " set prompt
+  " TODO: Prompt is now defined as: highlighted text + cmdline
+  let g:chatty_prompt = a:prompt
+
+  call chatty#BuildHistory()
+  " TODO: replace the highlighted text + print the response
+  " call chatty#PutResponse(g:chatty_response)
+endfunction

@@ -14,7 +14,8 @@
 " g:chatty_provider: AI client provider, ex: 'open_ai' (String)
 
 call config#Init()
-call helper#OperatorMapper('ch', 'chatty#Execute')
+call helper#OperatorMapper('ch', 'chatty#Ask')
+call helper#OperatorMapper('cH', 'chatty#Process')
 
 command! ChattyContextsPopup call helper#Popup('context#List', 'context#PopupCallBack')
 nnoremap <Leader>cc :ChattyContextsPopup<CR>
