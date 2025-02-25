@@ -1,7 +1,7 @@
 let s:root = expand('<sfile>:p:h:h')
 let s:chat_py = s:root . "/py/chat.py"
 
-" The python file sets g:chatty_response
+" The also sets g:chatty_response
 function! chatty#SetResponse()
   execute "py3file " . s:chat_py
 endfunction
@@ -25,8 +25,9 @@ function! chatty#BuildHistory()
   endif
 endfunction
 
-function! chatty#Ask(prompt = '')
-  let g:chatty_prompt = a:prompt
+" Fetch response and prints it below the prompt
+function! chatty#Ask(text = '')
+  let g:chatty_prompt = a:text
 
   call chatty#BuildHistory()
   call chatty#PutResponse(g:chatty_response)
@@ -36,12 +37,19 @@ function! chatty#PutResponse(response)
   put =a:response
 endfunction
 
-function! chatty#Process(prompt = '')
-  " set prompt
-  " TODO: Prompt is now defined as: highlighted text + cmdline
-  let g:chatty_prompt = a:prompt
+" Replaces the prompt with the response
+function! chatty#Process(text = '')
+  let l:user_prompt = input('Prompt: ')
+  let l:combined_prompt =  a:text .. "\n" .. l:user_prompt
 
+  let g:chatty_prompt = l:combined_prompt
   call chatty#BuildHistory()
-  " TODO: replace the highlighted text + print the response
-  " call chatty#PutResponse(g:chatty_response)
+  call chatty#ReplaceWithResponse()
+endfunction
+
+function! chatty#ReplaceWithResponse()
+  " TODO: preserve the old `gv`
+  " Right now it overrides the old `gv`
+  call setreg('"', g:chatty_response)
+  normal! gvp
 endfunction
