@@ -1,1 +1,0 @@
-{"id":"history1","name":"history1","history":[{"role":"system","content":"You are a helpful AI assistant."},{"role":"user","content":"What is 1 + 5?\n"},{"role":"assistant","content":"1 + 5 equals 6."},{"role":"user","content":"What is twice that?\n"},{"role":"assistant","content":"Twice of 6 is 12."}]}

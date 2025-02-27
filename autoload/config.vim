@@ -1,4 +1,5 @@
-let s:plugin_path = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
+" change this
+let s:chatty_plugin_fallback_path = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
 
 function! config#Init()
   let g:chatty_provider = get(g:, 'chatty_provider', 'open_ai')
@@ -10,9 +11,9 @@ function! config#Init()
 endfunction
 
 function! config#SetContext(context = 'default_assistant')
-  let g:chatty_abs_path = s:plugin_path
+  let g:chatty_abs_path = exists('g:chatty_abs_path') ? g:chatty_abs_path : s:chatty_plugin_fallback_path
   let g:chatty_context = a:context
-  let l:chatty_abs_context_path = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/contexts/' .. g:chatty_provider)
+  let l:chatty_abs_context_path = g:chatty_abs_path .. '/' .. 'chatty/contexts/' .. g:chatty_provider
   let g:chatty_context_path = l:chatty_abs_context_path .. '/' .. g:chatty_context .. '.json'
 endfunction
 

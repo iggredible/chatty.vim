@@ -2,6 +2,7 @@
 " g:chatty_prompt: latest prompt (String)
 " g:chatty_response: latest response (String)
 "
+" g:chatty_data_path: absolute path to chatty data (configs, histories).  Maybe?
 " g:chatty_abs_path: absolute path to chatty.vim (String)
 "
 " g:chatty_context_path: absolute path to context file (String)

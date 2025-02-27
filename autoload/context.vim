@@ -1,5 +1,5 @@
 function! context#List() abort
-  let l:context_dir = g:chatty_abs_path .. '/' .. get(g:, 'chatty_context_base_path', '.chatty/contexts/' .. g:chatty_provider)
+  let l:context_dir = g:chatty_abs_path .. '/' .. 'chatty/contexts/' .. g:chatty_provider
   
   if !isdirectory(l:context_dir)
     return []
