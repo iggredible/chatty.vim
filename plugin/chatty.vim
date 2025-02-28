@@ -1,8 +1,13 @@
 " NOTES: global variables
+" g:chatty_dir_path: absolute path to chatty data directory
+" Note: user can use this to override the path. IE:
+" let g:chatty_dir_path = '~/.config/foo/'
+" This will make the directory ~/.config/foo/ instead of ~/.config/chatty
+" Full absolute path theoretically should work. 
+" TODO: test if something like /Users/Plato/some/path would work too
+" 
 " g:chatty_prompt: latest prompt (String)
 " g:chatty_response: latest response (String)
-"
-" g:chatty_dir_path: absolute path to chatty data directory
 "
 " g:chatty_context_path: absolute path to context file (String)
 " g:chatty_context: current context path (String)
