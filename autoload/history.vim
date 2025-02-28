@@ -6,6 +6,10 @@ function! history#Create()
   call history#UpdateFile(l:history_file_path)
 endfunction
 
+function! history#Set(history = {})
+  let g:chatty_history = json_encode(add([], a:history))
+endfunction
+
 function! history#CreateFile(history_file_path)
   let l:content = [
     \ '{',

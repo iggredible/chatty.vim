@@ -1,3 +1,9 @@
+function! context#Set(context = 'default_assistant')
+  let g:chatty_context = a:context
+  let l:chatty_context_path = g:chatty_dir_path .. '/contexts/' .. g:chatty_provider
+  let g:chatty_context_path = l:chatty_context_path .. '/' .. g:chatty_context .. '.json'
+endfunction
+
 function! context#List() abort
   let l:context_dir = g:chatty_dir_path .. '/' .. '/contexts/' .. g:chatty_provider
   
@@ -28,7 +34,7 @@ function! context#Fetch(context_path)
 endfunction
 
 function! context#PopupCallBack(context)
-    call config#SetContext(a:context)
+    call context#Set(a:context)
     let l:context_history = context#Fetch(g:chatty_context_path)
     let g:chatty_history = json_encode(add([], l:context_history))
 
