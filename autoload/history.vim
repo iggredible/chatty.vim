@@ -1,6 +1,6 @@
 function! history#Create()
   let g:chatty_history_id = helper#GenerateUUID()
-  let l:chatty_abs_histories_path = g:chatty_abs_path .. '/' .. 'chatty/histories/' .. g:chatty_provider
+  let l:chatty_abs_histories_path = g:chatty_dir_path .. '/' .. 'histories/' .. g:chatty_provider
   let l:history_file_path = l:chatty_abs_histories_path .. '/' .. g:chatty_history_id .. '.json'
   call history#CreateFile(l:history_file_path)
   call history#UpdateFile(l:history_file_path)
@@ -24,7 +24,7 @@ function! history#CreateFile(history_file_path)
 endfunction
 
 function! history#GetFilePath(history_id = g:chatty_history_id)
-  let l:chatty_abs_histories_path = g:chatty_abs_path .. '/' .. 'chatty/histories/' .. g:chatty_provider
+  let l:chatty_abs_histories_path = g:chatty_dir_path .. '/histories/' .. g:chatty_provider
   let l:history_file = l:chatty_abs_histories_path .. '/' .. a:history_id .. '.json'
   
   if !filereadable(l:history_file)
@@ -50,18 +50,21 @@ function! history#Push(type = '')
 endfunction
 
 function! history#UpdateFile(history_file)
-  let l:content = join(readfile(a:history_file), '')
+  let l:history_file_expanded_path = expand(a:history_file)
+  let l:content = join(readfile(l:history_file_expanded_path), '')
 
     try
       let l:json_content = json_decode(l:content)
       let l:json_content.history = json_decode(g:chatty_history)
       let l:json_content.context = g:chatty_context
 
-      call writefile([json_encode(l:json_content)], a:history_file)
+      call writefile([json_encode(l:json_content)], l:history_file_expanded_path)
 
       return l:json_content
     catch
-      throw 'Invalid JSON in history file ' .. g:chatty_history_id .. '.json'
+      echohl ErrorMsg
+      echo 'Invalid JSON in history file ' .. g:chatty_history_id .. '.json'
+      echohl None
     endtry
 endfunction
 
@@ -86,7 +89,7 @@ function! history#Rename(name)
 endfunction
 
 function! history#List()
-  let l:context_dir = g:chatty_abs_path .. '/' .. 'chatty/contexts/' .. g:chatty_provider
+  let l:context_dir = g:chatty_dir_path .. '/' .. 'contexts/' .. g:chatty_provider
   
   if !isdirectory(l:context_dir)
     return []
@@ -124,7 +127,7 @@ function! history#PopupCallBack(history_name_id)
 endfunction
 
 function! history#Update(history_id)
-  let l:chatty_abs_histories_path = g:chatty_abs_path .. '/' .. 'chatty/histories/' .. g:chatty_provider
+  let l:chatty_abs_histories_path = g:chatty_dir_path .. '/' .. 'histories/' .. g:chatty_provider
   let l:history_file_path = l:chatty_abs_histories_path .. '/' .. a:history_id .. '.json'
   try
     let l:json_content = join(readfile(l:history_file_path), '')

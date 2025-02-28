@@ -1,5 +1,5 @@
 function! context#List() abort
-  let l:context_dir = g:chatty_abs_path .. '/' .. 'chatty/contexts/' .. g:chatty_provider
+  let l:context_dir = g:chatty_dir_path .. '/' .. '/contexts/' .. g:chatty_provider
   
   if !isdirectory(l:context_dir)
     return []
@@ -14,7 +14,7 @@ endfunction
 
 " Return { 'role': 'system', 'context': 'You are a helpful ai assistant' }
 function! context#Fetch(context_path)
-  let l:json_file = simplify(a:context_path)
+  let l:json_file = expand(simplify(a:context_path))
 
   try
       let l:json_content = join(readfile(l:json_file), '')
@@ -22,6 +22,7 @@ function! context#Fetch(context_path)
   catch
       echohl ErrorMsg
       echo "Failed to read config file: " .. v:exception .. '. Will be using a default context.'
+      echohl None
       return { 'role': 'system', 'content': 'You are a helpful AI assistant.' }
   endtry
 endfunction

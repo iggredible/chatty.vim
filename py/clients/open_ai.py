@@ -5,7 +5,7 @@ class OpenAIClient:
     ) -> None:
 
         # export OPENAI_API_KEY=YOUR_OPENAI_API_KEY
-        api_key = os.getenv("OPENAI_API_KEY")
+        api_key = os.getenv("OPENAI_API_KEY") or api_key
         if not api_key:
             raise ValueError("Please set OPENAI_API_KEY environment variable")
         self.api_key = api_key
@@ -34,8 +34,8 @@ class OpenAIClient:
         }
 
         config_path = os.path.join(
-            vim.eval('g:chatty_abs_path'),
-            '.chatty',
+            vim.eval('g:chatty_dir_path'),
+            'chatty',
             'configs',
             'open_ai.json'
         )
