@@ -93,7 +93,7 @@ function! history#Rename(name)
 endfunction
 
 function! history#List()
-  let l:context_dir = g:chatty_dir_path .. '/' .. 'contexts/' .. g:chatty_provider
+  let l:context_dir = g:chatty_dir_path .. '/histories/' .. g:chatty_provider
   
   if !isdirectory(l:context_dir)
     return []
