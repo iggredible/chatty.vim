@@ -20,8 +20,9 @@
 call config#Init()
 
 command! ChattyInstructionsPopup call helper#Popup('instruction#List', 'instruction#PopupCallBack')
-command! ChattyRenameHistory let name = input('Enter a new name: ') | call history#Rename(name)
+command! ChattyRenameHistory call history#Rename()
 command! ChattyHistoriesPopup call helper#Popup('history#List', 'history#PopupCallBack')
+command! ChattyNewHistory call history#Create() | echom 'History created!'
 
 " If user sets g:chatty_enable_operators = 0, skip keymaps
 if get(g:, 'chatty_enable_operators', 1)
@@ -30,7 +31,7 @@ if get(g:, 'chatty_enable_operators', 1)
 endif
 
 if get(g:, 'chatty_enable_instructions_popup_mapping', 1)
-  nnoremap <Leader>cc :ChattyInstructionsPopup<CR>
+  nnoremap <Leader>ci :ChattyInstructionsPopup<CR>
 endif
 
 if get(g:, 'chatty_enable_rename_history_mapping', 1)
@@ -39,4 +40,8 @@ endif
 
 if get(g:, 'chatty_enable_histories_popup_mapping', 1)
   nnoremap <Leader>ch :ChattyHistoriesPopup<CR>
+endif
+
+if get(g:, 'chatty_enable_new_history_mapping', 1)
+  nnoremap <Leader>cn :ChattyNewHistory<CR>
 endif

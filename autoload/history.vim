@@ -1,6 +1,11 @@
-function! history#Create()
-  let g:chatty_history_id = helper#GenerateUUID()
-  let l:chatty_abs_histories_path = g:chatty_dir_path .. '/' .. 'histories/' .. g:chatty_provider
+function! history#Create(...)
+  call config#InitHistory()
+
+  let l:name = a:0 > 0 ? a:1 : helper#GenerateUUID()
+
+  let g:chatty_history_id = l:name
+
+  let l:chatty_abs_histories_path = g:chatty_dir_path .. '/histories/' .. g:chatty_provider
   let l:history_file_path = l:chatty_abs_histories_path .. '/' .. g:chatty_history_id .. '.json'
   call history#CreateFile(l:history_file_path)
   call history#UpdateFile(l:history_file_path)
@@ -72,9 +77,11 @@ function! history#UpdateFile(history_file)
     endtry
 endfunction
 
-function! history#Rename(name)
+function! history#Rename()
+  let l:name = input('Enter a new name: ')
+
   if !exists('g:chatty_history_id')
-    call history#Create()
+    call history#Create(l:name)
   endif
 
   " Find history file
@@ -84,7 +91,7 @@ function! history#Rename(name)
   let l:content = join(readfile(l:history_file), '')
     try
       let l:json_content = json_decode(l:content)
-      let l:json_content.name = a:name
+      let l:json_content.name = l:name
 
       call writefile([json_encode(l:json_content)], l:history_file)
     catch
@@ -131,7 +138,7 @@ function! history#PopupCallBack(history_name_id)
 endfunction
 
 function! history#Update(history_id)
-  let l:chatty_abs_histories_path = g:chatty_dir_path .. '/' .. 'histories/' .. g:chatty_provider
+  let l:chatty_abs_histories_path = g:chatty_dir_path .. '/histories/' .. g:chatty_provider
   let l:history_file_path = l:chatty_abs_histories_path .. '/' .. a:history_id .. '.json'
   try
     let l:json_content = join(readfile(l:history_file_path), '')
