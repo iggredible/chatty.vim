@@ -1,9 +1,11 @@
 function! history#Create(...)
   call config#InitHistory()
 
-  let l:name = a:0 > 0 ? a:1 : helper#GenerateUUID()
+  let l:uuid = helper#GenerateUUID()
+  let l:name = a:0 > 0 ? a:1 : l:uuid
 
-  let g:chatty_history_id = l:name
+  let g:chatty_history_id = l:uuid
+  let g:chatty_history_name = l:name
 
   let l:chatty_abs_histories_path = g:chatty_dir_path .. '/histories/' .. g:chatty_provider
   let l:history_file_path = l:chatty_abs_histories_path .. '/' .. g:chatty_history_id .. '.json'
@@ -94,6 +96,7 @@ function! history#Rename()
       let l:json_content.name = l:name
 
       call writefile([json_encode(l:json_content)], l:history_file)
+      let g:chatty_history_name = l:name
     catch
       throw 'Invalid JSON in history file ' .. g:chatty_history_id .. '.json'
     endtry
@@ -145,6 +148,7 @@ function! history#Update(history_id)
     let l:content = json_decode(l:json_content)
     let l:content_history = content.history
     let g:chatty_history = json_encode(l:content_history)
+    let g:chatty_history_name = l:content.name
     let g:chatty_history_id = l:content.id
     echom 'History updated!'
   catch

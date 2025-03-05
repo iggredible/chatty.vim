@@ -19,9 +19,9 @@
 
 call config#Init()
 
-command! ChattyInstructionsPopup call helper#Popup('instruction#List', 'instruction#PopupCallBack')
+command! ChattyInstructions call helper#Popup('instruction#List', 'instruction#PopupCallBack')
+command! ChattyHistories call helper#Popup('history#List', 'history#PopupCallBack')
 command! ChattyRenameHistory call history#Rename()
-command! ChattyHistoriesPopup call helper#Popup('history#List', 'history#PopupCallBack')
 command! ChattyNewHistory call history#Create() | echom 'History created!'
 
 " If user sets g:chatty_enable_operators = 0, skip keymaps
@@ -30,16 +30,16 @@ if get(g:, 'chatty_enable_operators', 1)
   call helper#OperatorMapper('cH', 'chatty#Process')
 endif
 
-if get(g:, 'chatty_enable_instructions_popup_mapping', 1)
-  nnoremap <Leader>ci :ChattyInstructionsPopup<CR>
+if get(g:, 'chatty_enable_instructions_mapping', 1)
+  nnoremap <Leader>ci :ChattyInstructions<CR>
 endif
 
 if get(g:, 'chatty_enable_rename_history_mapping', 1)
   nnoremap <Leader>cr :ChattyRenameHistory<CR>
 endif
 
-if get(g:, 'chatty_enable_histories_popup_mapping', 1)
-  nnoremap <Leader>ch :ChattyHistoriesPopup<CR>
+if get(g:, 'chatty_enable_histories_mapping', 1)
+  nnoremap <Leader>ch :ChattyHistories<CR>
 endif
 
 if get(g:, 'chatty_enable_new_history_mapping', 1)
