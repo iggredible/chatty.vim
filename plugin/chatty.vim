@@ -18,15 +18,25 @@
 " g:chatty_provider: AI client provider, ex: 'open_ai' (String)
 
 call config#Init()
-call helper#OperatorMapper('ch', 'chatty#Ask')
-call helper#OperatorMapper('cH', 'chatty#Process')
 
 command! ChattyContextsPopup call helper#Popup('context#List', 'context#PopupCallBack')
-nnoremap <Leader>cc :ChattyContextsPopup<CR>
-
 command! ChattyRenameHistory let name = input('Enter a new name: ') | call history#Rename(name)
-nnoremap <Leader>cr :ChattyRenameHistory<CR>
-
-" command! ChattyHistoriesPopup call history#Popup()
 command! ChattyHistoriesPopup call helper#Popup('history#List', 'history#PopupCallBack')
-nnoremap <Leader>ch :ChattyHistoriesPopup<CR>
+
+" If user sets g:chatty_enable_operators = 0, skip keymaps
+if get(g:, 'chatty_enable_operators', 1)
+  call helper#OperatorMapper('ch', 'chatty#Ask')
+  call helper#OperatorMapper('cH', 'chatty#Process')
+endif
+
+if get(g:, 'chatty_enable_contexts_popup_mapping', 1)
+  nnoremap <Leader>cc :ChattyContextsPopup<CR>
+endif
+
+if get(g:, 'chatty_enable_rename_history_mapping', 1)
+  nnoremap <Leader>cr :ChattyRenameHistory<CR>
+endif
+
+if get(g:, 'chatty_enable_histories_popup_mapping', 1)
+  nnoremap <Leader>ch :ChattyHistoriesPopup<CR>
+endif
