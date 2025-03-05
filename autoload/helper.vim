@@ -84,7 +84,6 @@ function! helper#OperatorMapper(key, funcname, wrapper = 'helper#Operator') abor
 endfunction
 
 function! helper#Popup(list, f = 'test_null_function')
-  " let l:list = context#List()
   let l:list = call(a:list, [])
 
   function! PopupCallback(id, result) closure

@@ -9,8 +9,8 @@
 " g:chatty_prompt: latest prompt (String)
 " g:chatty_response: latest response (String)
 "
-" g:chatty_context_path: absolute path to context file (String)
-" g:chatty_context: current context path (String)
+" g:chatty_instruction_path: absolute path to instruction file (String)
+" g:chatty_instruction: current instruction path (String)
 "
 " g:chatty_history = current history (Encoded JSON)
 " g:chatty_history_id = current history ID (String)
@@ -19,7 +19,7 @@
 
 call config#Init()
 
-command! ChattyContextsPopup call helper#Popup('context#List', 'context#PopupCallBack')
+command! ChattyInstructionsPopup call helper#Popup('instruction#List', 'instruction#PopupCallBack')
 command! ChattyRenameHistory let name = input('Enter a new name: ') | call history#Rename(name)
 command! ChattyHistoriesPopup call helper#Popup('history#List', 'history#PopupCallBack')
 
@@ -29,8 +29,8 @@ if get(g:, 'chatty_enable_operators', 1)
   call helper#OperatorMapper('cH', 'chatty#Process')
 endif
 
-if get(g:, 'chatty_enable_contexts_popup_mapping', 1)
-  nnoremap <Leader>cc :ChattyContextsPopup<CR>
+if get(g:, 'chatty_enable_instructions_popup_mapping', 1)
+  nnoremap <Leader>cc :ChattyInstructionsPopup<CR>
 endif
 
 if get(g:, 'chatty_enable_rename_history_mapping', 1)

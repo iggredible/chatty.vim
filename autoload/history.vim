@@ -15,7 +15,7 @@ function! history#CreateFile(history_file_path)
     \ '{',
     \ '  "id": "' . g:chatty_history_id . '",',
     \ '  "name": "' . g:chatty_history_id . '",',
-    \ '  "context": "' . g:chatty_context . '",',
+    \ '  "instruction": "' . g:chatty_instruction . '",',
     \ '  "history": []',
     \ '}',
     \ '',
@@ -60,7 +60,7 @@ function! history#UpdateFile(history_file)
     try
       let l:json_content = json_decode(l:content)
       let l:json_content.history = json_decode(g:chatty_history)
-      let l:json_content.context = g:chatty_context
+      let l:json_content.instruction = g:chatty_instruction
 
       call writefile([json_encode(l:json_content)], l:history_file_expanded_path)
 
@@ -93,14 +93,14 @@ function! history#Rename(name)
 endfunction
 
 function! history#List()
-  let l:context_dir = g:chatty_dir_path .. '/histories/' .. g:chatty_provider
+  let l:instruction_dir = g:chatty_dir_path .. '/histories/' .. g:chatty_provider
   
-  if !isdirectory(l:context_dir)
+  if !isdirectory(l:instruction_dir)
     return []
   endif
   
   " Get list of all files with .json extension
-  let l:files = glob(l:context_dir . '/*.json', 0, 1)
+  let l:files = glob(l:instruction_dir . '/*.json', 0, 1)
   let l:result = []
 
   " Read each JSON file and extract name and id
