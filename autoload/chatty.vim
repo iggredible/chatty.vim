@@ -1,8 +1,8 @@
 let s:root = expand('<sfile>:p:h:h')
 let s:chat_py = s:root . "/py/chat.py"
 
-" The also sets g:chatty_response
-function! chatty#SetResponse()
+function! chatty#AskAndSetResponse()
+  " Ask client, Set g:chatty_response
   execute "py3file " . s:chat_py
 endfunction
 
@@ -12,7 +12,7 @@ function! chatty#BuildHistory()
 
   " Asks chat client
   " Sets g:chatty_response
-  call chatty#SetResponse()
+  call chatty#AskAndSetResponse()
 
   " Push response into history
   call history#Push('response')

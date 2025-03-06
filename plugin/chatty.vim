@@ -22,7 +22,7 @@ call config#Init()
 command! ChattyInstructions call helper#Popup('instruction#List', 'instruction#PopupCallBack')
 command! ChattyHistories call helper#Popup('history#List', 'history#PopupCallBack')
 command! ChattyRenameHistory call history#Rename()
-command! ChattyNewHistory call history#Create() | echom 'History created!'
+command! ChattyNewHistory call history#Init() | call history#Create() | echom 'History created!'
 
 " If user sets g:chatty_enable_operators = 0, skip keymaps
 if get(g:, 'chatty_enable_operators', 1)

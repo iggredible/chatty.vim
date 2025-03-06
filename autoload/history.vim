@@ -1,6 +1,4 @@
 function! history#Create(...)
-  call config#InitHistory()
-
   let l:uuid = helper#GenerateUUID()
   let l:name = a:0 > 0 ? a:1 : l:uuid
 
@@ -11,6 +9,11 @@ function! history#Create(...)
   let l:history_file_path = l:chatty_abs_histories_path .. '/' .. g:chatty_history_id .. '.json'
   call history#CreateFile(l:history_file_path)
   call history#UpdateFile(l:history_file_path)
+endfunction
+
+function! history#Init()
+  let l:init_history_instruction = instruction#Fetch(g:chatty_instruction_path)
+  call history#Set(l:init_history_instruction)
 endfunction
 
 function! history#Set(history = {})
@@ -57,6 +60,8 @@ function! history#Push(type = '')
     let l:history += [l:response]
   endif
 
+  " When running history#Push('prompt'), what does g:chatty_history look like?
+  " Does it have prompt?
   let g:chatty_history = json_encode(l:history)
 endfunction
 
