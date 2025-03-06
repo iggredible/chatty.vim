@@ -10,6 +10,7 @@ function! config#Init()
   " Make sure that chatty dir exists and is populated
   call files#EnsureChattyDir(s:chatty_dir_fallback_template_path)
 
-  call instruction#Set('default_assistant')
+  let l:chatty_instruction = get(g:, 'chatty_instruction', 'default_assistant')
+  call instruction#Set(l:chatty_instruction)
   call history#Init()
 endfunction
