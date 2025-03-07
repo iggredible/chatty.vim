@@ -11,6 +11,25 @@ function! history#Create(...)
   call history#UpdateFile(l:history_file_path)
 endfunction
 
+function! history#BuildHistoryObject()
+  " Push prompt into history
+  call history#Push('prompt')
+
+  " Asks chat client
+  " Sets g:chatty_response
+  call chatty#AskAndSetResponse()
+
+  " Push response into history
+  call history#Push('response')
+
+  if exists('g:chatty_history_id')
+    let l:history_file = history#GetFilePath()
+    call history#UpdateFile(l:history_file)
+  else
+    call history#Create()
+  endif
+endfunction
+
 function! history#Init()
   let l:init_history_instruction = instruction#Fetch(g:chatty_instruction_path)
   call history#Set(l:init_history_instruction)
