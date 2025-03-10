@@ -1,12 +1,33 @@
 # Chatty.vim
 
-Ask and process text with Chatty.
+Ask and process text with Chatty!
+
+## Chatty Philosophy
+
+Before getting into setup and usage, let's talk about what Chatty is and isn't.
+
+There already exist Vim AI plugins out there:
+- [copilot.vim](https://github.com/github/copilot.vim)
+- [Codecompanion.nvim](https://github.com/olimorris/codecompanion.nvim?tab=readme-ov-file)
+- [Codeium.nvim](https://github.com/Exafunction/codeium.nvim)
+- [ChatGPT.vim](https://github.com/jackMort/ChatGPT.nvim)
+- [vim-ai](https://github.com/madox2/vim-ai/)
+- [vim-chatgpt](https://github.com/CoderCookE/vim-chatgpt)
+
+The reason why I created Chatty is that none of them met my needs. I want AI features that are not too intrusive. Many of these plugins, IMO, turn Vim into a full-blown chat client program and they are not utilizing Vim's existing tools.
+
+Vim uses operators and command-line commands to modify texts. These are the bread and butter of Vim. I think a Vim chat plugin should be leveraging these. If I want a full-blown chat client, I can just go to [Claude](https://claude.ai/) or [ChatGPT](https://chatgpt.com/) sites.
+
+That's why I built Chatty.vim: to enable AI features in Vim while still keeping its usage "Vim"-like. I want to leverage what Vim already excels at (and what drew me to using Vim in the first place): lightweightness, operators, cmdlines, buffers, windows, etc.
+
+I use both Chatty.vim and I still go to claude or chatgpt website. This is not a replacement for those chat clients.
 
 ## Setup
 
-Chatty requires Vim with a Python3 support.
+Chatty requires Vim with Python3 support. Chatty currently only supports OPENAI (in the future, it will work with more AI providers).
 
-Chatty currently only supports OPENAI (in the future, it will work with more AI providers).
+
+### API Keys
 
 Chatty requires an OPENAI API key.
 
@@ -14,7 +35,7 @@ Chatty requires an OPENAI API key.
 export OPENAI_API_KEY=YOUR_OPENAI_KEY
 ```
 
-You can install it with Vim plugin managers. For example, if you use [vim-plug](https://github.com/junegunn/vim-plug):
+You can install Chatty with Vim plugin managers. For example, if you use [vim-plug](https://github.com/junegunn/vim-plug):
 
 ```
 Plug 'iggredible/chatty.vim'
@@ -33,7 +54,9 @@ let g:chatty_dir_path = '~/.config/foo/'
 
 ### Configs
 
-The `configs/` directory store the parameters to send to your provider. The provider file name inside `configs/` must use snake case. For example, inside `configs/open_ai.json`:
+The `configs/` directory stores the parameters to send to your provider. To use it, create a JSON file having the provider file name, in snake case, inside `configs/`. 
+
+For example, inside `configs/open_ai.json`:
 
 ```
 {
@@ -48,11 +71,11 @@ The `configs/` directory store the parameters to send to your provider. The prov
 
 ### Instructions
 
-The `instructions/` directory are for your conversation guides. Think of it as Persona in ChatGPT. I did not name this directory persona because it is not a universal concept (for example, [Claude does not have a persona concept](https://www.youtube.com/watch?v=T9aRN5JkmL8&t=1469s)). I think instruction conveys a better and more universal meaning. The instruction files are JSON files.
+The `instructions/` directory is for your conversation guides. Think of it as Persona in ChatGPT. I did not name this directory persona because it is not a universal concept (for example, [Claude does not have a persona concept](https://www.youtube.com/watch?v=T9aRN5JkmL8&t=1469s)). I think instruction conveys a better and more universal meaning.
 
-The convention is to store your instructions for each chat provider in their directory. Chatty currently only works with `open_ai`, so put all your instructions inside `instructions/open_ai/`.
+The convention is to store your instructions, in JSON files, for each chat provider in their directory. Chatty currently only works with `open_ai`, so put all your instructions inside `instructions/open_ai/`. Note that the chat provider directory name must match the config file name above. The actual JSON instruction file can be given any name.
 
-You can name JSON instruction file with any name. For example, if I want to have ChatGPT to respond in a style of shakespeare, I can create `instructions/open_ai/shakey.json`. Inside it:
+For example, if I want to have ChatGPT to respond in a style of Shakespeare, I can create `instructions/open_ai/shakey.json`. Inside it:
 
 ```
 {
@@ -63,7 +86,9 @@ You can name JSON instruction file with any name. For example, if I want to have
 
 ## Histories
 
-The `histories/` directory contains your chat histories. Each chat history is a chat session. Each history is stored inside a chat provider directory. Here's an example of a chat history `histories/open_ai/331965ed-73d5-405e-a063-d8fbadefd7f9.json`:
+The `histories/` directory contains your chat histories. Each chat history is a chat session. It is stored inside a directory named after a chat provider, similar to instructions. Unlike configs and instructions files where you manually need to create them, histories are automatically created and updated.
+
+For example, a chat history `histories/open_ai/331965ed-73d5-405e-a063-d8fbadefd7f9.json` will look like this:
 
 ```
 {
@@ -113,42 +138,24 @@ The `histories/` directory contains your chat histories. Each chat history is a 
 
 Notes: 
 - `id` is a UUID to ensure that each history is unique. 
-- `name` by default is the same as `id`, but you can rename it with `:ChattyRenameHistory` command.
+- `name` is to make it easier to identify and select a chat history; its value by default is the same as `id`, but you can rename it with `:ChattyRenameHistory` command.
 - `instruction` is the context name that you used when starting a new history.
-- `history` displays a list conversation history.
+- `history` is a list of prompt-response.
 
 
-### A little note on History
+### A Little Note on History
 
-Histories are useful for maintaining context in a conversation. That way, if you had previously asked, "What is 3 + 2?", the you can ask "What is double of that number?". Maintaining history allows your chat provider to know what 'that' number is.
+Histories are useful for maintaining conversation contexts. If you had previously asked, "What is 3 + 2?", then you can ask "What is double of that number?". Maintaining history allows your chat provider to know what 'that' number is.
 
-Each time you open Vim, Chatty will start a NEW history. Even if you use the same instruction. I find that I usually don't maintain a long conversation history. Also, the longer your chat history, the more token it uses. Chatty sends the entire history each time you make a request. They accumulate fast, so be careful.  Because histories are just text files, they are cheap and lightweight. You can accumulate as many histories as needed.  Don't be afraid to start a new chat history often (on how to start a new chat history, keep reading!)
+After you ask your first question to Chatty after you open Vim, Chatty will start a new history. Keep in mind that the longer your chat history grows, the more tokens it uses. Chatty sends the entire history each time you make a request. They accumulate fast, so be careful.
 
+Because histories are just text files, they are cheap and lightweight. Don't be afraid to accumulate as many histories as needed and delete ones you don't use (just make sure you don't delete the current history).
 
-## Chatty Philosophy
-
-Before getting into usages, let's talk about what Chatty is trying to do and what it isn't.
-
-There already exists AI Vim plugins out there, many of them are more fancy than Chatty.
-- [copilot.vim](https://github.com/github/copilot.vim)
-- [Codecompanion.nvim](https://github.com/olimorris/codecompanion.nvim?tab=readme-ov-file)
-- [Codeium.nvim](https://github.com/Exafunction/codeium.nvim)
-- [ChatGPT.vim](https://github.com/jackMort/ChatGPT.nvim)
-- [vim-ai](https://github.com/madox2/vim-ai/)
-- [vim-chatgpt](https://github.com/CoderCookE/vim-chatgpt)
-
-The reason why I created Chatty is that none of them met my needs. I want AI features that are not too intrusive. Many of these plugins, in my opinion, turn Vim into a full-blown chat client program and not using Vim's existing tools.
-
-Vim uses operators and command-line commands to modify texts. These are the bread and butter of Vim. I think a Vim chat plugin should be leveraging these. If I want a full-blown chat client, I can just go to https://claude.ai/ or https://chatgpt.com/.
-
-That's why I built Chatty.vim: to enable, AI features to Vim, while still keeping its usage "Vim"-like. I want to leverage what Vim already excels doing (and what drew me to using Vim in the first place): operators, cmdlines, buffers, windows, etc.
-
-I don't think we need to create a new "Chat" window type. We can do it with a "scratch note window".
-
-Personally, I use both Chatty.vim and I still go to claude or chatgpt website. This is not a replacement for those chat clients.
+If your conversation starts to rabbit trail, don't be afraid to start a new chat history (for how to start a new chat history, keep reading).
 
 ## Usages
-### Usage 1: Ask Operator
+
+### Usage 1: Ask (Operator)
 
 Chatty comes with an ask operator `ch`.
 
@@ -159,40 +166,59 @@ What is twice that?
 What is half that?
 ```
 
-With your cursor on the first line (on the "W" in What is 1 + 5?), if I want to ASK Chatty, I can use the line-wise Ask operator: `chh`. It will send to the AI provider the question, "What is 1 + 5?".
+With your cursor on the first line (on the "W" in "What is 1 + 5?"), if I want to ask Chatty, I can use the line-wise Ask operator: `chh`. It will send to the AI provider the question, "What is 1 + 5?". The response will be printed on the line below the current cursor. In this case, your AI provider (should) return 6 below "What is 1 + 5?" line.
 
-The response will be printed on the line below the current cursor. In this case,your AI provider (should) return 6 below "What is 1 + 5?" line.
-
-Other Chat operations work. For examples:
+Because `ch` is just an operation, motions and visuals work. Some examples:
 - `ch$` to send the texts from the current cursor position to the end of the line
 - `chj` to send the text from the current cursor's row and the row below it
 - `chf?` to send the text from the current cursor's location to the first occurrence of `?` ("find nearest '?'")
 
-### Usage 2: Ask and Process
+### Chatty Visual Operator
 
-Sometimes you don't want to ask questions, but instead you want Chatty to process a given text. No problem, you can Ask-and-process with `cH` operator.
+Vim operators work with visual mode. You can use the `ch` operator with visual mode. On the text that you want to ask, highlight them with `v` / `Ctrl-v` / `V`, then press `ch`.
 
-Here are some usage examples.
+### Chatty Doesn't Have a Chat Window Type
+
+Chatty doesn't have a "Chat" window type. If you want to have a conversation with Chatty, just open a new file (`:new` or `:vnew`) and start typing your questions.
+
+### Overriding the operator
+
+If you want to use your open operator instead of `ch`, say you want to map it to `gh` operator instead:
+
+```
+let g:chatty_enable_operators = 0
+call helper#OperatorMapper('gh', 'chatty#Ask')
+```
+
+The `helper#OperatorMapper` is a helper function. The first argument is the operator key (`gh`). The second argument is the function to execute. Have it mapped to `chatty#Ask`.
+
+### Usage 2: Ask and Transform (Operator)
+
+Sometimes you don't want to ask questions, but consume and transform a given text. No problem, you can ask-and-transform it with the `cH` operator.
+
+Below is a lits of a few things you can do with the process operator.
 
 #### Titlecase 
 
 If you have the following text:
+
 ```
 she sells seashells on the seashore
 ```
 
-And you want to titlecase it, with your cursor at the start of the line, run `cHH` to perform a line-wise Process operator. Immediately after you do that, a prompt will come up on the cmdline (bottom of your Vim window).
+To titlecase it, with your cursor at the start of the line, run `cHH` to perform a line-wise ChattyTransform operator. Immediately after, a prompt will come up on the cmdline (bottom of your Vim window).
 
 ```
 Prompt:
 ```
 
-You can then tell Chatty what you want to do with the text you just selected. I want to titlecase it, so I typed:
+Tell Chatty what you want to do with the target text.
+
 ```
 Prompt: Titlecase the text
 ```
 
-It will TRANSFORM the text you selected (unlike the ask operator where it displays the response below, the process operator transforms the selected text.
+It will transform the text you selected (unlike the ask operator where it displays the response below, the transform operator transforms the selected text).
 
 ```
 She Sells Seashells on the Seashore
@@ -201,34 +227,19 @@ She Sells Seashells on the Seashore
 #### Prettify
 
 Another example. Suppose that you have this JSON:
+
 ```
 { "meal": "breakfast", "dishes": ["eggs", "bacon", "toast"], "beverage": "coffee" }
 ```
-And you want to make it pretty. You can do it with `cHH` (or `cH$` if your cursor is at the start of the row), then type:
 
-```
-Prompt: Prettify JSON
-```
+To make it pretty, with your cursor at the start of the row, press `cHH` or `cH$`, then give it the prompt:
 
-And it will transform your JSON into:
-```
-{
-    "meal": "breakfast",
-    "dishes": [
-        "eggs",
-        "bacon",
-        "toast"
-    ],
-    "beverage": "coffee"
-}
-```
-
-You can even get fancy with:
 ```
 Prompt: Prettify JSON and replace all the meat products with vegetables
 ```
 
 Result:
+
 ```
 {
     "meal": "breakfast",
@@ -241,12 +252,15 @@ Pretty cool!
 
 #### Code generation
 
-Process can be used to generate codes too. For example, if you want to create a Fizbuzz, just type up the instruction:
+The Transform operator can be used to generate codes too.
+
+For example, if you want to create a Fizzbuzz code:
+
 ```
 Generate a fizzbuzz code in Ruby. Use recursion
 ```
 
-Then type `cHH`. You don't have to type anything for Prompt. Just leave it blank. It will replace your original instruction "Generate a fizzbuzz..." with the actual code!
+Type `cHH`. You don't have to type anything for Prompt. Leave it blank. It will replace your original instruction "Generate a Fizzbuzz..." with the actual code!
 
 ```ruby
 def fizzbuzz_recursive(n)
@@ -268,63 +282,75 @@ end
 fizzbuzz_recursive(100)
 ```
 
-### Usage3: Visual mode
+### Usage 3: Cmdline
 
-Vim operators work with visual mode. You can use both `ch` and `cH` operators with visual mode. 
+Chatty comes with 2 commands to complement the ask and transform operators: `:ChattyAsk` and `:ChattyTransform`.
 
-On the text that you want to ask / process, highlight them with `v` / `Ctrl-v` / `V`, then press either `ch` or `cH`.
+Like any commands, you can pass them a range argument. `:ChattyAsk` will pass all the text in the given range to chat provider. `:ChattyTransform` will consume and transform all the text in the given range to chat provider.
 
-### Usage4: Cmdline
+For example, if I have the following text:
 
-TODO:
-`:%ChattyAsk`
-`:1,4ChattyProcess`
+```
+Peter Piper picked a peck of pickled peppers.
+A peck of pickled peppers Peter Piper picked.
+If Peter Piper picked a peck of pickled peppers,
+Where’s the peck of pickled peppers Peter Piper picked?
+```
 
+If my cursor is on the first line and if I run `:.,+3ChattyProcess`, it will take the texts from the current cursor to 3 lines below me then it'll  ask me for a prompt. If I tell it to "uppercase the given text", it will replace it with the uppercased text.
+
+When you run `:ChattyProcess`, it will ask for confirmation if you want to proceed or not. If you run it with a bang (`:ChattyProcess!`), it won't ask for confirmation.
+
+More examples:
+- `:%ChattyAsk`: pass the text from the entire buffer to Chatty.
+- `5,10ChattyProcess`: consume the texts on lines 5 to 10 and transform them according to prompt.
+- `:5,ChattyAsk`: pass the text from lines 5 to the current line where the cursor is as a prompt.
+
+## Provider
+
+Chatty only supports openAI right now. Chatty stores the provider information with `g:chatty_provider` (`:echo g:chatty_provider`). In the future, you will be able to change providers. Chatty provider is spelled the same way as your config (ex: `chatty/configs/open_ai.json`).
 
 ## History
 
-
 ### Switching history
 
-If you want to go back to a previous chat history, you can switch history with `:ChattyHistories` (default mapping `<Leader>ch`. When you do that, Chatty will show a dropdown of all history in that provider. 
+You can switch history with `:ChattyHistories` (default mapping `<Leader>ch`). Chatty will show a dropdown of all histories in that provider, each history having the format of `HISTORYNAME__HISTORYID`. Recall HISTORYID is a UUID.
 
-Note: you can check your current provider with `g:chatty_provider`. Since Chatty currently only supports `open_ai`, you don't need to worry about that.
-
-When you do that, it will display a dropdown, with each history having the format of `historyName__historyID` (historyID is a UUID).
-
-When you switch history, Chatty will use that history, list and all that. It will pick up where you left off.
+When you switch history, Chatty will use that history, for subsequent chat. If in that history you've asked "What is the capital of Brazil?", you can pick up your chat and ask, "What is the biggest city of that city?". It knows that you were talking about Brazil, so it knows what the biggest city is. It picks up where you left off.
 
 ### Renaming history
 
-Your history name by default is its ID, which is a UUID. When you switch history, it will display `historyName__historyID`. But `historyName` is initially is a UUID. So you will see `d71c9e35-668b-4761-af5c-c86b21d6002b__d71c9e35-668b-4761-af5c-c86b21d6002b`. Sometimes you just want to have an easier-to-remember name. I mean, what the heck is "d71c9e35..."? Is that history when I asked about Ruby Procs, or when I asked about countries of the world? It is hard to remember UUID. 
+Your history name by default is its ID, which is a UUID. So you will see `d71c9e35-668b-4761-af5c-c86b21d6002b__d71c9e35-668b-4761-af5c-c86b21d6002b`, which can be hard to tell what history is this about (without looking at the `histories/` directory. You probably want to have an easier-to-remember name. I mean, what the heck is "d71c9e35..."? Is that the history when I asked about Ruby Procs or when I asked about countries of the world?
 
-In that case, you can rename history with `:ChattyRenameHistory`. It will prompt you to enter a new name. That name will be the name of the history JSON file. By default a history name uses the same UUID as a history ID, which can be difficult to remember. Now you can save one to have a name of "ruby_proc" and another as "countries".
+This is why you can rename history with `:ChattyRenameHistory`. It will prompt you to enter a new name. Think of it like a nickname. Now you can name one history `"ruby_proc"` and another as `"countries"`.
 
 Next time you switch history, you will see:
+
 ```
 ruby_proc__d71c9e35-668b-4761-af5c-c86b21d6002b
 countries__f814af0d-b138-486d-971a-acbfc6b0b4dc
 ```
 
+That's a lot easier to choose from.
+
 ### New history
 
-Think of history as chat session. I like to start a new chat session often. It keeps my usages low. It also keeps the chat provider to focus on a topic. If I was asking about Ruby Procs, then ActiveRecord queries, then Netflix architecture, then countries of the world all in one history, your chat provider may start giving unfocused answer. For that reason, I prefer to have a session for Ruby Procs, another for ActiveRecord queries, another for Netflix architecture and system design, and another for countries of the world (if I need to go back-and-forth between Ruby Procs and ActiveRecord queries, I can just toggle histories)
+Think of history as chat session. Start a new chat session often. It keeps my token usages low. It also keeps the chat provider to focus on a topic. If I was asking about Ruby Procs, then ActiveRecord queries, then Netflix architecture, then countries of the world all in one history, your chat provider may start giving unfocused answer. For that reason, I prefer to have a session for Ruby Procs, another for ActiveRecord queries, another for Netflix architecture (system design), and another for countries of the world. If I need to go back-and-forth between Ruby Procs and ActiveRecord queries, I can just toggle histories.:w
 
 For that reason, create a new history often. By default you can do it with `<Leader>cn` or `:ChattyNewHistory`.
 
-
-Note: each time you start Vim, Chatty start a new history
+Note: each time you start Vim, Chatty starts a new history.
 
 ### A History is just a JSON file
 
-Remember that history is just a JSON file. Any history operations done is usually either a creation or modifying a JSON file. You can always modify the JSON file (make sure you don't alter its `id`, `name`, and overall structure. But feel free to revise the history.
+Remember that a history is just a JSON file. Chatty history operations are either creating or modifying a JSON file. You can always modify the JSON file (make sure you don't alter its `id`, `name`, and overall structure). But feel free to revise the history.
 
 ## Instruction
 
-
-Instructions are the initial system prompt. If you want Chatty to act like a Senior Principal Ruby on Rails programmer, and/or make it to respond verbosely, or concisely, or like a Shakespeare, or like a pirate, you can put it here. Anything you want your AI provider to behave like.
+An instruction is an initial system prompt. It determine the overall behavior of the chat. If you want Chatty to act like a Senior Principal Ruby on Rails programmer, and/or make it to respond verbosely, or concisely, or like a Shakespeare, or like a pirate, you can put it here. Anything you want your AI provider to behave like.
 
 For example, in `chatty/instructions/open_ai/default_assistant.json`:
+
 ```
 {
   "role": "system",
@@ -332,7 +358,6 @@ For example, in `chatty/instructions/open_ai/default_assistant.json`:
 }
 ```
 
-Instructions determine the overall behavior of the chat.
 
 ### Default instruction
 
@@ -345,7 +370,7 @@ Chatty's default instruction is `default_assistant`. Meaning it will look inside
 }
 ```
 
-If you want to override the default instruction, you can just change the `content` into whatever you want.
+To override the default instruction, you can just change the `content` of that file into whatever you want.
 
 Alternatively, you can create a new file inside `chatty/instructions/open/ai/`, name it whatever you want (example: `chatty/instructions/open_ai/ruby_developer.json`), and pass it any instruction `content` you want. Then in your vimrc, add this:
 
@@ -353,6 +378,7 @@ Alternatively, you can create a new file inside `chatty/instructions/open/ai/`, 
 let g:chatty_instruction = 'ruby_developer'
 ```
 
+Now when you start Vim, chatty will use `ruby_developer` as default instruction
 
 ### Switching instructions
 
@@ -360,6 +386,10 @@ Once you create multiple instructions, you can switch between any instructions. 
 
 Note: when you switch an instruction, Chatty will start a new history.
 
-# TODO
+# Contributing
 
-Cmdline operations like: `:1,5 ChattyProcess` and `:% ChattyAsk`
+Ideas, suggestions, and bug fixes are welcome. Feel free to submit a PR! Your help is highly coveted and appreciated.
+
+# License
+
+MIT (c) Igor Irianto
