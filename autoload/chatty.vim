@@ -19,7 +19,7 @@ function! chatty#PutResponse(response)
 endfunction
 
 " Replaces the prompt with the response
-function! chatty#Process(text = '')
+function! chatty#Transform(text = '')
   let l:user_prompt = input('Prompt: ')
   let l:combined_prompt =  a:text .. "\n" .. l:user_prompt
 
@@ -42,17 +42,17 @@ function! chatty#AskCommand(...) abort
   call chatty#Ask(l:text)
 endfunction
 
-function! chatty#ProcessCommand(...) abort
+function! chatty#TransformCommand(...) abort
   let [l:lnum1, l:lnum2] = [a:1, a:2]
   let l:lines = getline(l:lnum1, l:lnum2)
-  let l:force_process = a:0 > 2 && a:3
+  let l:force = a:0 > 2 && a:3
 
   let l:text = join(l:lines, "\n")
 
   let l:user_prompt = input('Prompt: ')
   let l:combined_prompt =  l:text .. "\n" .. l:user_prompt
 
-  if !l:force_process
+  if !l:force
     let l:prompt_text = l:lnum1 == l:lnum2 ?
       \ 'This will replace all text on line ' .. l:lnum1 .. '. Are you sure? (y/n) ' :
       \ 'This will replace all texts between lines ' .. l:lnum1 .. ' and ' .. l:lnum2 .. '. Are you sure? (y/n) '

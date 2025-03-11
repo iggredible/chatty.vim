@@ -1,11 +1,9 @@
 class OpenAIClient:
     def __init__(
             self,
-            api_key: str = "YOUR_OPENAI_API_KEY"
+            api_key: str = os.getenv("OPENAI_API_KEY") or vim.eval('g:chatty_openai_api_key')
     ) -> None:
 
-        # export OPENAI_API_KEY=YOUR_OPENAI_API_KEY
-        api_key = os.getenv("OPENAI_API_KEY") or api_key
         if not api_key:
             raise ValueError("Please set OPENAI_API_KEY environment variable")
         self.api_key = api_key

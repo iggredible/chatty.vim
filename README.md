@@ -358,7 +358,6 @@ For example, in `chatty/instructions/open_ai/default_assistant.json`:
 }
 ```
 
-
 ### Default instruction
 
 Chatty's default instruction is `default_assistant`. Meaning it will look inside `chatty/instructions/open_ai/default_assistant.json`. 
@@ -385,6 +384,16 @@ Now when you start Vim, chatty will use `ruby_developer` as default instruction
 Once you create multiple instructions, you can switch between any instructions. The default is `<Leader>ci` or `:ChattyInstructions`. 
 
 Note: when you switch an instruction, Chatty will start a new history.
+
+## Quick(fix) Access to Config, History, and Instruction
+
+You can quickly see all histories, instructions, and configs with the following quickfix commands:
+
+```
+:ChattyQFHistories
+:ChattyQFInstructions
+:ChattyQFConfigs
+```
 
 # Contributing
 
