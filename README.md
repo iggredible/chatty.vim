@@ -306,6 +306,68 @@ More examples:
 - `5,10ChattyProcess`: consume the texts on lines 5 to 10 and transform them according to prompt.
 - `:5,ChattyAsk`: pass the text from lines 5 to the current line where the cursor is as a prompt.
 
+#### Global Command
+
+You can use `ChattyAsk` and `ChattyTransform` with the global (`:g`) command to ask consecutive questions.
+
+Given a list of questions, but you don't want to answer them all. You only want to ask some lines (the `TODO` lines):
+
+```
+TODO: What is 1 + 5?
+TODO: What is twice that?
+TODO: What is half that?
+What is the capital of Japan?
+```
+
+If you run `:g/TODO/ChattyAsk`, Vim will get only the `TODO` lines.
+
+```
+TODO: What is 1 + 5?
+6
+TODO: What is twice that?
+12
+TODO: What is half that?
+3
+What is the capital of Japan?
+```
+
+Note: Due to the nature of the global command, Vim submits a prompt for each matching row. In the above example, the history looks like this:
+
+```json
+[
+    {
+        "role": "system",
+        "content": "You are a helpful AI assistant. Any programming-related questions to create, update, or analyze code, respond with code only. Omit explanations. If the question is not related to programming, answer concisely."
+    },
+    {
+        "role": "user",
+        "content": "TODO: What is 1 + 5?"
+    },
+    {
+        "role": "assistant",
+        "content": "6"
+    },
+    {
+        "role": "user",
+        "content": "TODO: What is twice that?"
+    },
+    {
+        "role": "assistant",
+        "content": "12"
+    },
+    {
+        "role": "user",
+        "content": "TODO: What is half that?"
+    },
+    {
+        "role": "assistant",
+        "content": "3"
+    }
+]
+```
+
+Keep that in mind so that you don't run the `:g` command with 1000+ matches.
+
 ## Provider
 
 Chatty only supports openAI right now. Chatty stores the provider information with `g:chatty_provider` (`:echo g:chatty_provider`). In the future, you will be able to change providers. Chatty provider is spelled the same way as your config (ex: `chatty/configs/open_ai.json`).

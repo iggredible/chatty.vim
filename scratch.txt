@@ -5,7 +5,7 @@ What is the average GDP?
 
 What is 1 + 5?
 What is twice that?
-WHat is half that?
+What is half that?
 
 Print Genesis 1:1-28 in KJV
 
