@@ -1,0 +1,484 @@
+*chatty.txt*  Ask and transform text with Chatty
+
+===============================================================================
+CONTENTS                                                        *chatty-contents*
+
+    1. Introduction ......................... |chatty-introduction|
+    2. Setup ................................ |chatty-setup|
+       2.1 API Keys ......................... |chatty-api-keys|
+       2.2 Installation ..................... |chatty-installation|
+    3. Chatty Directory ..................... |chatty-directory|
+       3.1 Configs .......................... |chatty-configs|
+       3.2 Instructions ..................... |chatty-instructions|
+       3.3 Histories ........................ |chatty-histories|
+    4. Usage ................................ |chatty-usage|
+       4.1 Ask (Operator) ................... |chatty-ask-operator|
+       4.2 Ask and Transform (Operator) ..... |chatty-transform-operator|
+       4.3 Cmdline .......................... |chatty-cmdline|
+    5. Provider ............................. |chatty-provider|
+    6. History Management ................... |chatty-history-management|
+       6.1 Switching History ................ |chatty-switching-history|
+       6.2 Renaming History ................. |chatty-renaming-history|
+       6.3 New History ...................... |chatty-new-history|
+    7. Instruction Management ............... |chatty-instruction-management|
+       7.1 Default Instruction .............. |chatty-default-instruction|
+       7.2 Switching Instructions ........... |chatty-switching-instructions|
+    8. Quickfix Access ...................... |chatty-quickfix|
+    9. Commands ............................. |chatty-commands|
+   10. Mappings ............................. |chatty-mappings|
+   11. Variables ............................ |chatty-variables|
+
+===============================================================================
+1. Introduction                                           *chatty-introduction*
+
+Chatty is a Vim plugin that allows users to communicate with AI models like 
+ChatGPT directly from Vim. It provides operators, commands, and a lightweight 
+approach to leverage AI capabilities while maintaining Vim's editing style.
+
+===============================================================================
+2. Setup                                                        *chatty-setup*
+
+Chatty requires Vim with Python3 support. Currently, Chatty only supports 
+OPENAI as a provider (more providers planned for the future).
+
+-------------------------------------------------------------------------------
+2.1 API Keys                                                 *chatty-api-keys*
+
+Chatty requires an OPENAI API key. You can provide it using an environment 
+variable or define it in your vimrc:
+
+    # Terminal
+    export OPENAI_API_KEY=YOUR_OPENAI_KEY
+
+    " vimrc
+    let g:chatty_openai_api_key = 'YOUR_OPENAI_KEY'
+
+-------------------------------------------------------------------------------
+2.2 Installation                                         *chatty-installation*
+
+You can install Chatty with any Vim plugin manager. For example with vim-plug:
+
+    Plug 'iggredible/chatty.vim'
+
+===============================================================================
+3. Chatty Directory                                       *chatty-directory*
+
+Chatty relies on data inside the `chatty/` directory, which contains three 
+important parts: `configs`, `instructions`, and `histories`.
+
+By default, Chatty stores data in `~/.config/chatty`. If this directory doesn't 
+exist, Chatty will create it the first time you run Vim. You can override this 
+location with the `g:chatty_dir_path` variable:
+
+    let g:chatty_dir_path = '~/.config/foo/'
+
+-------------------------------------------------------------------------------
+3.1 Configs                                                  *chatty-configs*
+
+The `configs/` directory stores parameters to send to your AI provider. Create 
+a JSON file with the provider name (in snake case) inside the `configs/` directory.
+
+For example, in `configs/open_ai.json`:
+
+    {
+      "model": "gpt-3.5-turbo",
+      "max_tokens": 2000,
+      "temperature": 0.7,
+      "top_p": 1.0,
+      "frequency_penalty": 0.0,
+      "presence_penalty": 0.0
+    }
+
+-------------------------------------------------------------------------------
+3.2 Instructions                                        *chatty-instructions*
+
+The `instructions/` directory contains conversation guides (similar to personas 
+in ChatGPT). Store instructions as JSON files for each chat provider in their 
+directory. Currently, only OpenAI is supported, so put instructions in 
+`instructions/open_ai/`. The provider directory name must match the config file 
+name. The instruction JSON file can have any name.
+
+Example for `instructions/open_ai/shakey.json`:
+
+    {
+      "role": "system",
+      "content": "Reply in the style of William Shakespeare."
+    }
+
+-------------------------------------------------------------------------------
+3.3 Histories                                              *chatty-histories*
+
+The `histories/` directory contains chat histories, with each history 
+representing a chat session. Histories are stored in directories named after 
+the chat provider. Unlike configs and instructions, histories are automatically 
+created and updated.
+
+Example for `histories/open_ai/331965ed-73d5-405e-a063-d8fbadefd7f9.json`:
+
+    {
+      "id": "331965ed-73d5-405e-a063-d8fbadefd7f9",
+      "name": "331965ed-73d5-405e-a063-d8fbadefd7f9",
+      "history": [
+        {
+          "role": "system",
+          "content": "You are a helpful AI assistant. Any programming-related 
+                      questions to create, update, or analyze code, respond with
+                      code only. Omit explanations. If the question is not 
+                      related to programming, answer concisely."
+        },
+        {
+          "role": "user",
+          "content": "What is the capital of Brazil?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "Brasília."
+        },
+        {
+          "role": "user",
+          "content": "What is the biggest city in that country?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "São Paulo."
+        },
+        {
+          "role": "user",
+          "content": "What is the estimated population of that city?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "12.33 million."
+        },
+        {
+          "role": "user",
+          "content": "What is the average GDP?\n"
+        },
+        {
+          "role": "assistant",
+          "content": "$1.12 trillion."
+        }
+      ],
+      "instruction": "default_assistant"
+    }
+
+Note on History:                                        *chatty-history-note*
+Histories maintain conversation context, allowing for follow-up questions.
+After your first question in a Vim session, Chatty starts a new history.
+Be aware that longer histories consume more tokens, as Chatty sends the entire
+history with each request.
+
+===============================================================================
+4. Usage                                                       *chatty-usage*
+
+-------------------------------------------------------------------------------
+4.1 Ask (Operator)                                     *chatty-ask-operator*
+
+Chatty provides the `ch` ask operator to send text to your AI provider.
+
+Example: With text "What is 1 + 5?" and cursor at the beginning of the line:
+- `chh` (line-wise operator) sends "What is 1 + 5?" to the AI provider
+- Response prints on the line below the cursor
+
+Because `ch` is a normal Vim operator, it works with motions and visual mode:
+- `ch$` sends text from cursor to end of line
+- `chj` sends text from current line and the line below
+- `chf?` sends text from cursor to first occurrence of '?'
+- Visual selection + `ch` sends the selected text
+
+Overriding the operator:                           *chatty-override-operator*
+If you want to use a different operator, disable the default and map your own:
+
+    let g:chatty_enable_operators = 0
+    call helper#OperatorMapper('gh', 'chatty#Ask')
+
+-------------------------------------------------------------------------------
+4.2 Ask and Transform (Operator)                *chatty-transform-operator*
+
+The `cH` operator processes and transforms text. After using this operator, 
+Chatty prompts for instructions on how to transform the selected text.
+
+Examples:
+
+1. Titlecasing:
+   With text "she sells seashells on the seashore":
+   - Position cursor at start of line
+   - Type `cHH` (line-wise transform)
+   - Enter prompt: "Titlecase the text"
+   - Result: "She Sells Seashells on the Seashore"
+
+2. Prettifying JSON:
+   With JSON: `{ "meal": "breakfast", "dishes": ["eggs", "bacon", "toast"], 
+                 "beverage": "coffee" }`
+   - Type `cHH` or `cH$`
+   - Enter prompt: "Prettify JSON and replace all meat products with vegetables"
+   - Result:
+     ```
+     {
+         "meal": "breakfast",
+         "dishes": ["eggs", "vegetables", "toast"],
+         "beverage": "coffee"
+     }
+     ```
+
+3. Code generation:
+   With text: "Generate a fizzbuzz code in Ruby. Use recursion"
+   - Type `cHH`
+   - Leave prompt blank
+   - Original text gets replaced with the Ruby code
+
+-------------------------------------------------------------------------------
+4.3 Cmdline                                              *chatty-cmdline*
+
+Chatty provides two command-line commands:
+- `:ChattyAsk`: Sends text to the AI provider
+- `:ChattyTransform`: Transforms text according to a prompt
+
+Both commands accept range arguments:
+- `:%ChattyAsk`: Sends entire buffer as a prompt
+- `:5,10ChattyTransform`: Transforms lines 5-10 according to prompt
+- `:5,ChattyAsk`: Sends lines from line 5 to current cursor line
+
+These commands also work with the global command:
+- `:g/TODO/ChattyAsk`: Sends each line containing "TODO" to the AI provider
+  Note: This sends each matching line as a separate prompt, which impacts history
+
+When using `:ChattyTransform`, you'll be asked for confirmation. Use 
+`:ChattyTransform!` (with bang) to skip confirmation.
+
+===============================================================================
+5. Provider                                                 *chatty-provider*
+
+Currently, Chatty only supports OpenAI. Provider information is stored in 
+`g:chatty_provider`. Provider names in Chatty match config file names 
+(e.g., `chatty/configs/open_ai.json`).
+
+===============================================================================
+6. History Management                               *chatty-history-management*
+
+-------------------------------------------------------------------------------
+6.1 Switching History                             *chatty-switching-history*
+
+Use `:ChattyHistories` (default mapping `<Leader>ch`) to switch between 
+histories. Chatty displays a dropdown of all histories for the current 
+provider, with format `HISTORYNAME__HISTORYID`.
+
+When you switch history, Chatty continues from where that history left off.
+
+-------------------------------------------------------------------------------
+6.2 Renaming History                             *chatty-renaming-history*
+
+By default, history names are UUIDs, which can be hard to remember. Use 
+`:ChattyRenameHistory` to give your history a more meaningful name.
+
+Once renamed, your histories will appear as:
+```
+ruby_proc__d71c9e35-668b-4761-af5c-c86b21d6002b
+countries__f814af0d-b138-486d-971a-acbfc6b0b4dc
+```
+
+-------------------------------------------------------------------------------
+6.3 New History                                       *chatty-new-history*
+
+Create a new history session with `:ChattyNewHistory` (default mapping 
+`<Leader>cn`). Starting new histories regularly helps:
+- Keep token usage low
+- Keep the chat provider focused on specific topics
+- Organize different conversation threads
+
+Note: Chatty starts a new history each time you start Vim.
+
+===============================================================================
+7. Instruction Management                       *chatty-instruction-management*
+
+An instruction is an initial system prompt that determines the overall behavior 
+of the chat provider.
+
+-------------------------------------------------------------------------------
+7.1 Default Instruction                       *chatty-default-instruction*
+
+Chatty's default instruction is `default_assistant`, which looks for 
+`chatty/instructions/open_ai/default_assistant.json`:
+
+    {
+      "role": "system",
+      "content": "You are a helpful AI assistant. Any programming-related 
+                  questions to create, update, or analyze code, respond with 
+                  code only. Omit explanations. If the question is not related 
+                  to programming, answer concisely."
+    }
+
+To override the default, either:
+1. Change the content of the default file, or
+2. Create a new instruction file and set it as default in your vimrc:
+
+    let g:chatty_instruction = 'ruby_developer'
+
+-------------------------------------------------------------------------------
+7.2 Switching Instructions                   *chatty-switching-instructions*
+
+Switch between instructions with `:ChattyInstructions` (default mapping 
+`<Leader>ci`). 
+
+Note: Switching instructions starts a new history.
+
+===============================================================================
+8. Quickfix Access                                        *chatty-quickfix*
+
+Quickly access histories, instructions, and configs using the `:ChattyQF` command:
+
+    :ChattyQF -h     " or :ChattyQF --history
+    :ChattyQF -i     " or :ChattyQF --instruction
+    :ChattyQF -c     " or :ChattyQF --config
+
+This opens a quickfix list showing all items of the specified type. Selecting 
+an item opens the corresponding file for viewing or editing.
+
+===============================================================================
+9. Commands                                                *chatty-commands*
+
+*:ChattyInstructions*                                    *:ChattyInstructions*
+    Displays a popup with all available instructions.
+    You can select an instruction to apply to future conversations.
+
+*:ChattyHistories*                                        *:ChattyHistories*
+    Displays a popup with all available histories.
+    You can select a history to continue a previous conversation.
+
+*:ChattyRenameHistory*                                  *:ChattyRenameHistory*
+    Prompts for a new name for the current history.
+    Makes it easier to identify conversation histories.
+
+*:ChattyNewHistory*                                      *:ChattyNewHistory*
+    Creates a new history session.
+    Starts a fresh conversation thread with the AI provider.
+
+*:ChattyAsk* [range]                                          *:ChattyAsk*
+    Sends text in the specified range to the AI provider.
+    Response is printed below the prompt.
+
+*:ChattyTransform* [range]                                *:ChattyTransform*
+    Transforms text in the specified range according to a prompt.
+    With [!], skips confirmation.
+    Replaces the original text with the AI response.
+
+*:ChattyQF* {option}                                          *:ChattyQF*
+    Opens a quickfix list with histories, instructions, or configs.
+    Options: -h/--history, -i/--instruction, -c/--config
+    Allows for quick navigation and editing of Chatty files.
+
+===============================================================================
+10. Mappings                                              *chatty-mappings*
+
+Default Operators:
+    ch     Ask operator                                        *chatty-ch*
+           Sends text to the AI provider based on a motion or selection.
+    
+    cH     Transform operator                                  *chatty-cH*
+           Transforms text according to a prompt based on a motion or selection.
+
+Default Key Mappings:
+    <Leader>ci    Run :ChattyInstructions            *chatty-leader-ci*
+                  Displays a popup to select instruction.
+    
+    <Leader>cr    Run :ChattyRenameHistory           *chatty-leader-cr*
+                  Prompts to rename the current history.
+    
+    <Leader>ch    Run :ChattyHistories               *chatty-leader-ch*
+                  Displays a popup to select history.
+    
+    <Leader>cn    Run :ChattyNewHistory              *chatty-leader-cn*
+                  Creates a new history session.
+
+Disabling Default Mappings:                    *chatty-disable-mappings*
+To disable operators:
+    let g:chatty_enable_operators = 0
+
+To disable specific command mappings:
+    let g:chatty_enable_instructions_mapping = 0
+    let g:chatty_enable_rename_history_mapping = 0
+    let g:chatty_enable_histories_mapping = 0
+    let g:chatty_enable_new_history_mapping = 0
+
+Creating Custom Mappings:                      *chatty-custom-mappings*
+For custom operators:
+    call helper#OperatorMapper('gh', 'chatty#Ask')
+    call helper#OperatorMapper('gH', 'chatty#Transform')
+
+For custom command mappings:
+    nnoremap <Leader>i :ChattyInstructions<CR>
+    nnoremap <Leader>r :ChattyRenameHistory<CR>
+    nnoremap <Leader>h :ChattyHistories<CR>
+    nnoremap <Leader>n :ChattyNewHistory<CR>
+
+===============================================================================
+11. Variables                                              *chatty-variables*
+
+*g:chatty_dir_path*                                      *g:chatty_dir_path*
+    Absolute path to Chatty data directory.
+    Default: '~/.config/chatty/'
+    Example: let g:chatty_dir_path = '~/.config/foo/'
+
+*g:chatty_prompt*                                        *g:chatty_prompt*
+    Latest prompt (String).
+    Contains the most recent text sent to the AI provider.
+
+*g:chatty_response*                                      *g:chatty_response*
+    Latest response (String).
+    Contains the most recent response from the AI provider.
+
+*g:chatty_instruction_path*                        *g:chatty_instruction_path*
+    Absolute path to the current instruction file (String).
+    Points to the JSON file containing system instructions.
+
+*g:chatty_instruction*                                *g:chatty_instruction*
+    Current instruction name (String).
+    Default: 'default_assistant'
+    Example: let g:chatty_instruction = 'ruby_developer'
+
+*g:chatty_history*                                      *g:chatty_history*
+    Current history (Encoded JSON).
+    Contains the full conversation history for the current session.
+
+*g:chatty_history_id*                                  *g:chatty_history_id*
+    Current history ID (String).
+    Unique identifier for the current conversation history.
+
+*g:chatty_provider*                                    *g:chatty_provider*
+    AI client provider (String).
+    Default: 'open_ai'
+    Determines which AI service to use for communication.
+
+*g:chatty_openai_api_key*                          *g:chatty_openai_api_key*
+    OpenAI API Key.
+    Required for authentication with OpenAI services.
+    Example: let g:chatty_openai_api_key = 'YOUR_OPENAI_KEY'
+
+*g:chatty_enable_operators*                      *g:chatty_enable_operators*
+    Enable default operator mappings.
+    Default: 1 (enabled)
+    When set to 0, disables the ch and cH operators.
+    Example: let g:chatty_enable_operators = 0
+
+*g:chatty_enable_instructions_mapping*    *g:chatty_enable_instructions_mapping*
+    Enable <Leader>ci mapping for ChattyInstructions command.
+    Default: 1 (enabled)
+    When set to 0, the default mapping is not created.
+
+*g:chatty_enable_rename_history_mapping*  *g:chatty_enable_rename_history_mapping*
+    Enable <Leader>cr mapping for ChattyRenameHistory command.
+    Default: 1 (enabled)
+    When set to 0, the default mapping is not created.
+
+*g:chatty_enable_histories_mapping*        *g:chatty_enable_histories_mapping*
+    Enable <Leader>ch mapping for ChattyHistories command.
+    Default: 1 (enabled)
+    When set to 0, the default mapping is not created.
+
+*g:chatty_enable_new_history_mapping*      *g:chatty_enable_new_history_mapping*
+    Enable <Leader>cn mapping for ChattyNewHistory command.
+    Default: 1 (enabled)
+    When set to 0, the default mapping is not created.
+
+===============================================================================
+vim:tw=78:ts=8:ft=help:norl:

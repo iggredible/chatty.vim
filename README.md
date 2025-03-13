@@ -1,6 +1,6 @@
 # Chatty.vim
 
-Ask and process text with Chatty!
+Ask and transform text with Chatty!
 
 ## Chatty Philosophy
 
