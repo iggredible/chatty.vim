@@ -46,7 +46,7 @@ You can install Chatty with Vim plugin managers. For example, if you use [vim-pl
 Plug 'iggredible/chatty.vim'
 ```
 
-## Chatty directory
+## Chatty Directory
 
 Chatty relies on data inside the `chatty/` directory. There are 3 important parts: `configs`, `instructions`, and `histories`, each stored inside a directory with the same name.
 
@@ -148,7 +148,7 @@ Notes:
 - `history` is a list of prompt-response.
 
 
-### A Little Note on History
+### A Note On Chat History
 
 Histories are useful for maintaining conversation contexts. If you had previously asked, "What is 3 + 2?", then you can ask "What is double of that number?". Maintaining history allows your chat provider to know what 'that' number is.
 
@@ -255,7 +255,7 @@ Result:
 
 Pretty cool!
 
-#### Code generation
+#### Code Generation
 
 The Transform operator can be used to generate codes too.
 
@@ -379,13 +379,13 @@ Chatty only supports openAI right now. Chatty stores the provider information wi
 
 ## History
 
-### Switching history
+### Switching History
 
 You can switch history with `:ChattyHistories` (default mapping `<Leader>ch`). Chatty will show a dropdown of all histories in that provider, each history having the format of `HISTORYNAME__HISTORYID`. Recall HISTORYID is a UUID.
 
 When you switch history, Chatty will use that history, for subsequent chat. If in that history you've asked "What is the capital of Brazil?", you can pick up your chat and ask, "What is the biggest city of that city?". It knows that you were talking about Brazil, so it knows what the biggest city is. It picks up where you left off.
 
-### Renaming history
+### Renaming History
 
 Your history name by default is its ID, which is a UUID. So you will see `d71c9e35-668b-4761-af5c-c86b21d6002b__d71c9e35-668b-4761-af5c-c86b21d6002b`, which can be hard to tell what history is this about (without looking at the `histories/` directory. You probably want to have an easier-to-remember name. I mean, what the heck is "d71c9e35..."? Is that the history when I asked about Ruby Procs or when I asked about countries of the world?
 
@@ -400,7 +400,7 @@ countries__f814af0d-b138-486d-971a-acbfc6b0b4dc
 
 That's a lot easier to choose from.
 
-### New history
+### New History
 
 Think of history as chat session. Start a new chat session often. It keeps my token usages low. It also keeps the chat provider to focus on a topic. If I was asking about Ruby Procs, then ActiveRecord queries, then Netflix architecture, then countries of the world all in one history, your chat provider may start giving unfocused answer. For that reason, I prefer to have a session for Ruby Procs, another for ActiveRecord queries, another for Netflix architecture (system design), and another for countries of the world. If I need to go back-and-forth between Ruby Procs and ActiveRecord queries, I can just toggle histories.:w
 
@@ -408,7 +408,7 @@ For that reason, create a new history often. By default you can do it with `<Lea
 
 Note: each time you start Vim, Chatty starts a new history.
 
-### A History is just a JSON file
+### A History Is Just A JSON File
 
 Remember that a history is just a JSON file. Chatty history operations are either creating or modifying a JSON file. You can always modify the JSON file (make sure you don't alter its `id`, `name`, and overall structure). But feel free to revise the history.
 
@@ -425,7 +425,7 @@ For example, in `chatty/instructions/open_ai/default_assistant.json`:
 }
 ```
 
-### Default instruction
+### Default Instruction
 
 Chatty's default instruction is `default_assistant`. Meaning it will look inside `chatty/instructions/open_ai/default_assistant.json`. 
 
@@ -446,7 +446,7 @@ let g:chatty_instruction = 'ruby_developer'
 
 Now when you start Vim, chatty will use `ruby_developer` as default instruction
 
-### Switching instructions
+### Switching Instructions
 
 Once you create multiple instructions, you can switch between any instructions. The default is `<Leader>ci` or `:ChattyInstructions`. 
 
