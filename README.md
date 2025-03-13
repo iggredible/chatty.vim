@@ -29,10 +29,15 @@ Chatty requires Vim with Python3 support. Chatty currently only supports OPENAI 
 
 ### API Keys
 
-Chatty requires an OPENAI API key.
+Chatty requires an OPENAI API key. You can either use an environment variable or define it in Vimrc.
+
 
 ```
+# Terminal
 export OPENAI_API_KEY=YOUR_OPENAI_KEY
+
+" vimrc
+let g:chatty_openai_api_key = 'YOUR_OPENAI_KEY'
 ```
 
 You can install Chatty with Vim plugin managers. For example, if you use [vim-plug](https://github.com/junegunn/vim-plug):
