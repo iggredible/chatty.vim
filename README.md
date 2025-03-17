@@ -1,6 +1,6 @@
 # Chatty.vim
 
-Ask and transform text with Chatty!
+Ask Chatty!
 
 ## Why Chatty?
 
@@ -197,9 +197,9 @@ call helper#OperatorMapper('gh', 'chatty#Ask')
 
 The `helper#OperatorMapper` is a helper function. The first argument is the operator key (`gh`). The second argument is the function to execute. Have it mapped to `chatty#Ask`.
 
-### Usage 2: Ask and Transform (Operator)
+### Usage 2: Ask! (Operator)
 
-Sometimes you don't want to ask questions, but consume and transform a given text. No problem, you can ask-and-transform it with the `cH` operator.
+Sometimes you don't want to ask questions. Sometimes you want to transform a given text. No problem, you can ask-and-transform it with the `cH` operator.
 
 Below is a lits of a few things you can do with the process operator.
 
@@ -211,7 +211,7 @@ If you have the following text:
 she sells seashells on the seashore
 ```
 
-To titlecase it, with your cursor at the start of the line, run `cHH` to perform a line-wise ChattyTransform operator. Immediately after, a prompt will come up on the cmdline (bottom of your Vim window).
+To titlecase it, with your cursor at the start of the line, run `cHH` to perform a line-wise `ChattyAsk!` operator. Immediately after, a prompt will come up on the cmdline (bottom of your Vim window).
 
 ```
 Prompt:
@@ -223,7 +223,7 @@ Tell Chatty what you want to do with the target text.
 Prompt: Titlecase the text
 ```
 
-It will transform the text you selected (unlike the ask operator where it displays the response below, the transform operator transforms the selected text).
+It will transform the text you selected (unlike the ask operator where it displays the response below, this operator replaces the selected text).
 
 ```
 She Sells Seashells on the Seashore
@@ -257,7 +257,7 @@ Pretty cool!
 
 #### Code Generation
 
-The Transform operator can be used to generate codes too.
+The operator can be used to generate codes too.
 
 For example, if you want to create a Fizzbuzz code:
 
@@ -289,9 +289,9 @@ fizzbuzz_recursive(100)
 
 ### Usage 3: Cmdline
 
-Chatty comes with 2 commands to complement the ask and transform operators: `:ChattyAsk` and `:ChattyTransform`.
+Chatty comes with 2 commands to complement the ask and ask-and-transform operators: `:ChattyAsk` and `:ChattyAsk!`.
 
-Like any commands, you can pass them a range argument. `:ChattyAsk` will pass all the text in the given range to chat provider. `:ChattyTransform` will consume and transform all the text in the given range to chat provider.
+Like any commands, you can pass them a range argument. `:ChattyAsk` will pass all the text in the given range to chat provider. `:ChattyAsk!` will consume and transform all the text in the given range to chat provider.
 
 For example, if I have the following text:
 
@@ -308,12 +308,12 @@ When you run `:ChattyProcess`, it will ask for confirmation if you want to proce
 
 More examples:
 - `:%ChattyAsk`: pass the text from the entire buffer to Chatty.
-- `5,10ChattyProcess`: consume the texts on lines 5 to 10 and transform them according to prompt.
+- `5,10ChattyAsk!`: consume the texts on lines 5 to 10 and transform them according to prompt.
 - `:5,ChattyAsk`: pass the text from lines 5 to the current line where the cursor is as a prompt.
 
 #### Global Command
 
-You can use `ChattyAsk` and `ChattyTransform` with the global (`:g`) command to ask consecutive questions.
+You can use `ChattyAsk` and `ChattyAsk!` with the global (`:g`) command to ask consecutive questions.
 
 Given a list of questions, but you don't want to answer them all. You only want to ask some lines (the `TODO` lines):
 
