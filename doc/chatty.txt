@@ -1,4 +1,4 @@
-*chatty.txt*  Ask and transform text with Chatty
+*chatty.txt*  Ask Chatty
 
 ===============================================================================
 CONTENTS                                                        *chatty-contents*
@@ -13,7 +13,7 @@ CONTENTS                                                        *chatty-contents
        3.3 Histories ........................ |chatty-histories|
     4. Usage ................................ |chatty-usage|
        4.1 Ask (Operator) ................... |chatty-ask-operator|
-       4.2 Ask and Transform (Operator) ..... |chatty-transform-operator|
+       4.2 Ask! (Operator) .................. |chatty-askbang-operator|
        4.3 Cmdline .......................... |chatty-cmdline|
     5. Provider ............................. |chatty-provider|
     6. History Management ................... |chatty-history-management|
@@ -193,7 +193,7 @@ If you want to use a different operator, disable the default and map your own:
     call helper#OperatorMapper('gh', 'chatty#Ask')
 
 -------------------------------------------------------------------------------
-4.2 Ask and Transform (Operator)                *chatty-transform-operator*
+4.2 Ask! (Operator)                                  *chatty-askbang-operator*
 
 The `cH` operator processes and transforms text. After using this operator, 
 Chatty prompts for instructions on how to transform the selected text.
@@ -232,19 +232,16 @@ Examples:
 
 Chatty provides two command-line commands:
 - `:ChattyAsk`: Sends text to the AI provider
-- `:ChattyTransform`: Transforms text according to a prompt
+- `:ChattyAsk!`: Transforms text according to a prompt
 
 Both commands accept range arguments:
 - `:%ChattyAsk`: Sends entire buffer as a prompt
-- `:5,10ChattyTransform`: Transforms lines 5-10 according to prompt
+- `:5,10ChattyAsk!`: Transforms lines 5-10 according to prompt
 - `:5,ChattyAsk`: Sends lines from line 5 to current cursor line
 
 These commands also work with the global command:
 - `:g/TODO/ChattyAsk`: Sends each line containing "TODO" to the AI provider
   Note: This sends each matching line as a separate prompt, which impacts history
-
-When using `:ChattyTransform`, you'll be asked for confirmation. Use 
-`:ChattyTransform!` (with bang) to skip confirmation.
 
 ===============================================================================
 5. Provider                                                 *chatty-provider*
@@ -357,9 +354,8 @@ an item opens the corresponding file for viewing or editing.
     Sends text in the specified range to the AI provider.
     Response is printed below the prompt.
 
-*:ChattyTransform* [range]                                *:ChattyTransform*
+*:ChattyAsk!* [range]                                       *:ChattyAsk!*
     Transforms text in the specified range according to a prompt.
-    With [!], skips confirmation.
     Replaces the original text with the AI response.
 
 *:ChattyQF* {option}                                          *:ChattyQF*
@@ -374,7 +370,7 @@ Default Operators:
     ch     Ask operator                                        *chatty-ch*
            Sends text to the AI provider based on a motion or selection.
     
-    cH     Transform operator                                  *chatty-cH*
+    cH     Ask! operator                                       *chatty-cH*
            Transforms text according to a prompt based on a motion or selection.
 
 Default Key Mappings:
