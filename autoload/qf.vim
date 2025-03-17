@@ -1,4 +1,4 @@
-function! ChattyQF(arg)
+function! qf#ChattyQF(arg)
   if a:arg == '-h' || a:arg == '--history'
     call qf#Histories()
   elseif a:arg == '-i' || a:arg == '--instruction'
