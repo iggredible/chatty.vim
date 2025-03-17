@@ -403,7 +403,7 @@ To disable specific command mappings:
 Creating Custom Mappings:                      *chatty-custom-mappings*
 For custom operators:
     call helper#OperatorMapper('gh', 'chatty#Ask')
-    call helper#OperatorMapper('gH', 'chatty#Transform')
+    call helper#OperatorMapper('gH', 'chatty#AskBang')
 
 For custom command mappings:
     nnoremap <Leader>i :ChattyInstructions<CR>

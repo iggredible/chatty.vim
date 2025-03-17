@@ -2,7 +2,7 @@
 
 Ask and transform text with Chatty!
 
-## Chatty Philosophy
+## Why Chatty?
 
 Before getting into setup and usage, let's talk about what Chatty is and isn't.
 
@@ -14,9 +14,9 @@ There already exist Vim AI plugins out there:
 - [vim-ai](https://github.com/madox2/vim-ai/)
 - [vim-chatgpt](https://github.com/CoderCookE/vim-chatgpt)
 
-The reason why I created Chatty is that none of them met my needs. I want AI features that are not too intrusive. Many of these plugins, IMO, turn Vim into a full-blown chat client program and they are not utilizing Vim's existing tools.
+The reason why I created Chatty is that none of them met my needs. It seems that these plugins are not utilizing Vim's existing tools and that they turn Vim into a full-blown chat client. It doesn't feel like I'm in Vim. I feel like I'm using a chat app.
 
-Vim uses operators and command-line commands to modify texts. These are the bread and butter of Vim. I think a Vim chat plugin should be leveraging these. If I want a full-blown chat client, I can just go to [Claude](https://claude.ai/) or [ChatGPT](https://chatgpt.com/) sites.
+What makes Vim... Vim (to me) is that it is a text editor first. Vim uses operators and command-line commands to modify texts. These are the bread and butter of Vim. I think a Vim chat plugin should be leveraging these. If I want a full-blown chat client, I can just go to [Claude](https://claude.ai/) or [ChatGPT](https://chatgpt.com/) sites.
 
 That's why I built Chatty.vim: to enable AI features in Vim while still keeping its usage "Vim"-like. I want to leverage what Vim already excels at (and what drew me to using Vim in the first place): lightweightness, operators, cmdlines, buffers, windows, etc.
 
