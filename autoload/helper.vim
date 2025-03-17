@@ -49,7 +49,9 @@ function! helper#Operator(f = 'test_null_function', context = {}, type = '') abo
     execute 'silent noautocmd keepjumps normal! ' .. commands
 
     let regText = getreg('"')
-    execute 'call function(a:f)(regText)'
+    let highest_linenum = line("']")  " Get the highest line number
+
+    execute 'call function(a:f)(regText, highest_linenum)'
 
     if a:type ==# 'line'
       call setpos('.', orig_pos)
