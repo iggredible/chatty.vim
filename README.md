@@ -8,10 +8,17 @@ Note: Chatty is still being improved. Expect new features to be added. However, 
 
 Chatty requires Vim with Python3 support. Chatty currently only supports OPENAI (in the future, it will work with more AI providers).
 
+### Install
+
+You can install Chatty with Vim plugin managers. For example, if you use [vim-plug](https://github.com/junegunn/vim-plug):
+
+```
+Plug 'iggredible/chatty.vim'
+```
+
 ### API Keys
 
 Chatty requires an OPENAI API key. You can either use an environment variable or define it in Vimrc.
-
 
 ```
 # Terminal
@@ -21,15 +28,15 @@ export OPENAI_API_KEY=YOUR_OPENAI_KEY
 let g:chatty_openai_api_key = 'YOUR_OPENAI_KEY'
 ```
 
-You can install Chatty with Vim plugin managers. For example, if you use [vim-plug](https://github.com/junegunn/vim-plug):
+If you want to use `g:chatty_openai_api_key` but do not want to live on the edge (exposing your API keys in your vimrc), check out [vim-dotenv](https://github.com/tpope/vim-dotenv) to store them inside `.env`.
 
-```
-Plug 'iggredible/chatty.vim'
-```
-
-## Chatty Directory
+### Directories
 
 Chatty relies on data inside the `chatty/` directory. There are 3 important parts: `configs`, `instructions`, and `histories`, each stored inside a directory with the same name.
+
+After you installed chatty, Vim should automatically generate the chatty directories in `~/.config/` (or if you defined them in `let g:chatty_dir_path = '~/.config/foo/'`). If for whatever reason they are not generated (permission issue?), you can add them yourself. Copy the `chatty/` directory and everything inside from [chatty.vim/chatty/](https://github.com/iggredible/chatty.vim/tree/main/chatty) Github page.
+
+## Chatty Directory
 
 Chatty by default stores your data inside `~/.config/chatty` directory. If there isn't one created, the first time you run Vim, it will create it for you. You can override it with `g:chatty_dir_path` variable. If you want to store inside `~/.config/foo`, in your vimrc, do:
 
