@@ -2,30 +2,11 @@
 
 Ask Chatty!
 
-## Why Chatty?
-
-Before getting into setup and usage, let's talk about what Chatty is and isn't.
-
-There already exist Vim AI plugins out there:
-- [copilot.vim](https://github.com/github/copilot.vim)
-- [Codecompanion.nvim](https://github.com/olimorris/codecompanion.nvim?tab=readme-ov-file)
-- [Codeium.nvim](https://github.com/Exafunction/codeium.nvim)
-- [ChatGPT.vim](https://github.com/jackMort/ChatGPT.nvim)
-- [vim-ai](https://github.com/madox2/vim-ai/)
-- [vim-chatgpt](https://github.com/CoderCookE/vim-chatgpt)
-
-The reason why I created Chatty is that none of them met my needs. It seems that these plugins are not utilizing Vim's existing tools and that they turn Vim into a full-blown chat client. It doesn't feel like I'm in Vim. I feel like I'm using a chat app.
-
-What makes Vim... Vim (to me) is that it is a text editor first. Vim uses operators and command-line commands to modify texts. These are the bread and butter of Vim. I think a Vim chat plugin should be leveraging these. If I want a full-blown chat client, I can just go to [Claude](https://claude.ai/) or [ChatGPT](https://chatgpt.com/) sites.
-
-That's why I built Chatty.vim: to enable AI features in Vim while still keeping its usage "Vim"-like. I want to leverage what Vim already excels at (and what drew me to using Vim in the first place): lightweightness, operators, cmdlines, buffers, windows, etc.
-
-I use both Chatty.vim and I still go to claude or chatgpt website. This is not a replacement for those chat clients.
+Note: Chatty is still being improved. Expect new features to be added. However, it is good enough for daily usage. 
 
 ## Setup
 
 Chatty requires Vim with Python3 support. Chatty currently only supports OPENAI (in the future, it will work with more AI providers).
-
 
 ### API Keys
 
@@ -469,6 +450,17 @@ You can quickly see all histories, instructions, and configs quickfix list with 
 ```
 
 It will open a quickfix that lists all histories / instructions / configs. When you choose one of them, it will take you to that file so you can read / configure it.
+
+# Alternatives
+
+There are other Vim AI plugins out there:
+- [copilot.vim](https://github.com/github/copilot.vim)
+- [Codecompanion.nvim](https://github.com/olimorris/codecompanion.nvim?tab=readme-ov-file)
+- [Codeium.nvim](https://github.com/Exafunction/codeium.nvim)
+- [ChatGPT.vim](https://github.com/jackMort/ChatGPT.nvim)
+- [vim-ai](https://github.com/madox2/vim-ai/)
+- [vim-chatgpt](https://github.com/CoderCookE/vim-chatgpt)
+- etc
 
 # Contributing
 
