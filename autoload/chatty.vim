@@ -1,61 +1,65 @@
 let s:root = expand('<sfile>:p:h:h')
 let s:chat_py = s:root . "/py/chat.py"
 
-function! chatty#RunResultWindow(scratch_buffer_name = 'chatty_result')
-  call helpers#windows#WindowFactory(a:scratch_buffer_name)
-endfunction
-
-function! chatty#RunPromptWindow(scratch_buffer_name = 'chatty_prompt')
-  call helpers#windows#WindowFactory(a:scratch_buffer_name)
-endfunction
-
-function! chatty#RunResultAndPromptWindows()
-  call chatty#RunResultWindow('chatty_result')
-  call chatty#RunPromptWindow('chatty_prompt')
-endfunction
-
-function! chatty#GetChatResponse()
-  let l:cursor_save = getpos('.')
-  let l:prompt_text = join(getline(1, '$'), "\n")
-  call setpos('.', l:cursor_save)
-
+function! chatty#AskAndSetResponse()
+  " Ask client, Set g:chatty_response
   execute "py3file " . s:chat_py
 endfunction
 
-function! chatty#ChatOperator(type = '')
-  if a:type ==# ''
-    set opfunc=chatty#ChatOperator
-    return 'g@'
+" Fetch response and prints it below the prompt
+function! chatty#Ask(text = '', linenum = -1)
+  let g:chatty_prompt = a:text
+
+  call history#BuildHistoryObject()
+  call chatty#PutResponse(g:chatty_response, a:linenum)
+endfunction
+
+function! chatty#PutResponse(response, linenum = -1)
+  if a:linenum < 0
+    put =a:response
+  else
+    call append(a:linenum, split(a:response, '\n'))
   endif
+endfunction
 
-  " save inits
-  let l:sel_save = &selection
-  let l:reg_save = getreginfo('"')
-  let l:cb_save = &clipboard
-  let l:visual_marks_save = [getpos("`<"), getpos("`>")]
-  let l:pos_save = getpos('.')
+" Replaces the prompt with the response
+function! chatty#AskBang(text = '', _linenum = -1)
+  let l:user_prompt = input('Prompt: ')
+  let l:combined_prompt =  a:text .. "\n" .. l:user_prompt
 
-  try
-    " get phrase
-    set clipboard= selection=inclusive
-    let l:commands = #{line: "`[V`]y", char: "`[v`]y", block: "`[\<c-v>`]y"}
+  let g:chatty_prompt = l:combined_prompt
+  call history#BuildHistoryObject()
+  call chatty#ReplaceWithResponse()
+endfunction
 
-    silent exe 'noautocmd keepjumps normal! ' .. get(l:commands, a:type, '')
+function! chatty#ReplaceWithResponse()
+  " TODO: preserve the old `gv`
+  " Right now it overrides the old `gv`
+  call setreg('"', g:chatty_response)
+  normal! gvp
+endfunction
 
-    let l:prompt_text = getreg('"')
+function! chatty#AskCommand(...) abort
+  let [l:lnum1, l:lnum2] = [a:1, a:2]
+  let l:lines = getline(l:lnum1, l:lnum2)
+  let l:force = a:0 > 2 && a:3
 
-    execute "py3file " . s:chat_py
-  finally
+  let l:text = join(l:lines, "\n")
 
-    " restore inits
-    call setreg('"', l:reg_save)
-    call setpos("'<", l:visual_marks_save[0])
-    call setpos("'>", l:visual_marks_save[1])
-    call setpos('.', l:pos_save)
-    let &clipboard = l:cb_save
-    let &selection = l:sel_save
-  endtry
+  if !l:force
+    call chatty#Ask(l:text, l:lnum2)
+  else
+    let l:user_prompt = input('Prompt: ')
+    let l:combined_prompt =  l:text .. "\n" .. l:user_prompt
 
-  set opfunc=
-  return
+    let g:chatty_prompt = l:combined_prompt
+
+    " This would call AskAndSetResponse
+    call history#BuildHistoryObject()
+
+    let l:result = g:chatty_response
+    let l:result_lines = split(l:result, "\n")
+    call deletebufline(bufnr('%'), l:lnum1, l:lnum2)
+    call appendbufline(bufnr('%'), l:lnum1 - 1, l:result_lines)
+  endif
 endfunction
