@@ -311,6 +311,12 @@ More examples:
 - `5,10ChattyAsk!`: consume the texts on lines 5 to 10 and transform them according to prompt.
 - `:5,ChattyAsk`: pass the text from lines 5 to the current line where the cursor is as a prompt.
 
+You can also create your own custom command. If you want to create a custom command `:Chat` and `:Chat!` to do the same thing as `:ChattyAsk` and `:ChattyAsk!`, do this in Vimrc:
+
+```
+command! -range -bar -bang Chat call chatty#AskCommand(<line1>, <line2>, <bang>0)
+```
+
 #### Global Command
 
 You can use `ChattyAsk` and `ChattyAsk!` with the global (`:g`) command to ask consecutive questions.
