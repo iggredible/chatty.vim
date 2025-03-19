@@ -174,17 +174,17 @@ history with each request.
 -------------------------------------------------------------------------------
 4.1 Ask (Operator)                                     *chatty-ask-operator*
 
-Chatty provides the `ch` ask operator to send text to your AI provider.
+Chatty provides the `ga` ask operator to send text to your AI provider.
 
 Example: With text "What is 1 + 5?" and cursor at the beginning of the line:
-- `chh` (line-wise operator) sends "What is 1 + 5?" to the AI provider
+- `gaa` (line-wise operator) sends "What is 1 + 5?" to the AI provider
 - Response prints on the line below the cursor
 
-Because `ch` is a normal Vim operator, it works with motions and visual mode:
-- `ch$` sends text from cursor to end of line
-- `chj` sends text from current line and the line below
-- `chf?` sends text from cursor to first occurrence of '?'
-- Visual selection + `ch` sends the selected text
+Because `ga` is a normal Vim operator, it works with motions and visual mode:
+- `ga$` sends text from cursor to end of line
+- `gaj` sends text from current line and the line below
+- `gaf?` sends text from cursor to first occurrence of '?'
+- Visual selection + `ga` sends the selected text
 
 Overriding the operator:                           *chatty-override-operator*
 If you want to use a different operator, disable the default and map your own:
@@ -195,7 +195,7 @@ If you want to use a different operator, disable the default and map your own:
 -------------------------------------------------------------------------------
 4.2 Ask! (Operator)                                  *chatty-askbang-operator*
 
-The `cH` operator processes and transforms text. After using this operator, 
+The `gA` operator processes and transforms text. After using this operator, 
 Chatty prompts for instructions on how to transform the selected text.
 
 Examples:
@@ -203,14 +203,14 @@ Examples:
 1. Titlecasing:
    With text "she sells seashells on the seashore":
    - Position cursor at start of line
-   - Type `cHH` (line-wise transform)
+   - Type `gAA` (line-wise transform)
    - Enter prompt: "Titlecase the text"
    - Result: "She Sells Seashells on the Seashore"
 
 2. Prettifying JSON:
    With JSON: `{ "meal": "breakfast", "dishes": ["eggs", "bacon", "toast"], 
                  "beverage": "coffee" }`
-   - Type `cHH` or `cH$`
+   - Type `gAA` or `gA$`
    - Enter prompt: "Prettify JSON and replace all meat products with vegetables"
    - Result:
      ```
@@ -223,7 +223,7 @@ Examples:
 
 3. Code generation:
    With text: "Generate a fizzbuzz code in Ruby. Use recursion"
-   - Type `cHH`
+   - Type `gAA`
    - Leave prompt blank
    - Original text gets replaced with the Ruby code
 
@@ -256,7 +256,7 @@ Currently, Chatty only supports OpenAI. Provider information is stored in
 -------------------------------------------------------------------------------
 6.1 Switching History                             *chatty-switching-history*
 
-Use `:ChattyHistories` (default mapping `<Leader>ch`) to switch between 
+Use `:ChattyHistories` (default mapping `<Leader>ah`) to switch between
 histories. Chatty displays a dropdown of all histories for the current 
 provider, with format `HISTORYNAME__HISTORYID`.
 
@@ -278,7 +278,7 @@ countries__f814af0d-b138-486d-971a-acbfc6b0b4dc
 6.3 New History                                       *chatty-new-history*
 
 Create a new history session with `:ChattyNewHistory` (default mapping 
-`<Leader>cn`). Starting new histories regularly helps:
+`<Leader>an`). Starting new histories regularly helps:
 - Keep token usage low
 - Keep the chat provider focused on specific topics
 - Organize different conversation threads
@@ -315,7 +315,7 @@ To override the default, either:
 7.2 Switching Instructions                   *chatty-switching-instructions*
 
 Switch between instructions with `:ChattyInstructions` (default mapping 
-`<Leader>ci`). 
+`<Leader>ai`). 
 
 Note: Switching instructions starts a new history.
 
@@ -367,23 +367,23 @@ an item opens the corresponding file for viewing or editing.
 10. Mappings                                              *chatty-mappings*
 
 Default Operators:
-    ch     Ask operator                                        *chatty-ch*
+    ga     Ask operator                                        *chatty-ga*
            Sends text to the AI provider based on a motion or selection.
     
-    cH     Ask! operator                                       *chatty-cH*
+    gA     Ask! operator                                       *chatty-gA*
            Transforms text according to a prompt based on a motion or selection.
 
 Default Key Mappings:
-    <Leader>ci    Run :ChattyInstructions            *chatty-leader-ci*
+    <Leader>ai    Run :ChattyInstructions            *chatty-leader-ai*
                   Displays a popup to select instruction.
     
-    <Leader>cr    Run :ChattyRenameHistory           *chatty-leader-cr*
+    <Leader>ar    Run :ChattyRenameHistory           *chatty-leader-ar*
                   Prompts to rename the current history.
     
-    <Leader>ch    Run :ChattyHistories               *chatty-leader-ch*
+    <Leader>ah    Run :ChattyHistories               *chatty-leader-ah*
                   Displays a popup to select history.
     
-    <Leader>cn    Run :ChattyNewHistory              *chatty-leader-cn*
+    <Leader>an    Run :ChattyNewHistory              *chatty-leader-an*
                   Creates a new history session.
 
 Disabling Default Mappings:                    *chatty-disable-mappings*
@@ -453,26 +453,26 @@ For custom command mappings:
 *g:chatty_enable_operators*                      *g:chatty_enable_operators*
     Enable default operator mappings.
     Default: 1 (enabled)
-    When set to 0, disables the ch and cH operators.
+    When set to 0, disables the ga and gA operators.
     Example: let g:chatty_enable_operators = 0
 
 *g:chatty_enable_instructions_mapping*    *g:chatty_enable_instructions_mapping*
-    Enable <Leader>ci mapping for ChattyInstructions command.
+    Enable <Leader>ai mapping for ChattyInstructions command.
     Default: 1 (enabled)
     When set to 0, the default mapping is not created.
 
 *g:chatty_enable_rename_history_mapping*  *g:chatty_enable_rename_history_mapping*
-    Enable <Leader>cr mapping for ChattyRenameHistory command.
+    Enable <Leader>ar mapping for ChattyRenameHistory command.
     Default: 1 (enabled)
     When set to 0, the default mapping is not created.
 
 *g:chatty_enable_histories_mapping*        *g:chatty_enable_histories_mapping*
-    Enable <Leader>ch mapping for ChattyHistories command.
+    Enable <Leader>ah mapping for ChattyHistories command.
     Default: 1 (enabled)
     When set to 0, the default mapping is not created.
 
 *g:chatty_enable_new_history_mapping*      *g:chatty_enable_new_history_mapping*
-    Enable <Leader>cn mapping for ChattyNewHistory command.
+    Enable <Leader>an mapping for ChattyNewHistory command.
     Default: 1 (enabled)
     When set to 0, the default mapping is not created.
 

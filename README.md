@@ -150,7 +150,7 @@ If your conversation starts to rabbit trail, don't be afraid to start a new chat
 
 ### Usage 1: Ask (Operator)
 
-Chatty comes with an ask operator `ch`.
+Chatty comes with an ask operator `ga`.
 
 Suppose you have this text:
 ```
@@ -159,16 +159,16 @@ What is twice that?
 What is half that?
 ```
 
-With your cursor on the first line (on the "W" in "What is 1 + 5?"), if I want to ask Chatty, I can use the line-wise Ask operator: `chh`. It will send to the AI provider the question, "What is 1 + 5?". The response will be printed on the line below the current cursor. In this case, your AI provider (should) return 6 below "What is 1 + 5?" line.
+With your cursor on the first line (on the "W" in "What is 1 + 5?"), if I want to ask Chatty, I can use the line-wise Ask operator: `gaa`. It will send to the AI provider the question, "What is 1 + 5?". The response will be printed on the line below the current cursor. In this case, your AI provider (should) return 6 below "What is 1 + 5?" line.
 
-Because `ch` is just an operation, motions and visuals work. Some examples:
-- `ch$` to send the texts from the current cursor position to the end of the line
-- `chj` to send the text from the current cursor's row and the row below it
-- `chf?` to send the text from the current cursor's location to the first occurrence of `?` ("find nearest '?'")
+Because `ga` is just an operation, motions and visuals work. Some examples:
+- `ga$` to send the texts from the current cursor position to the end of the line
+- `gaj` to send the text from the current cursor's row and the row below it
+- `gaf?` to send the text from the current cursor's location to the first occurrence of `?` ("find nearest '?'")
 
 ### Chatty Visual Operator
 
-Vim operators work with visual mode. You can use the `ch` operator with visual mode. On the text that you want to ask, highlight them with `v` / `Ctrl-v` / `V`, then press `ch`.
+Vim operators work with visual mode. You can use the `ga` operator with visual mode. On the text that you want to ask, highlight them with `v` / `Ctrl-v` / `V`, then press `ga`.
 
 ### Chatty Doesn't Have a Chat Window Type
 
@@ -176,7 +176,7 @@ Chatty doesn't have a "Chat" window type. If you want to have a conversation wit
 
 ### Overriding the operator
 
-If you want to use your open operator instead of `ch`, say you want to map it to `gh` operator instead:
+If you want to use your open operator instead of `ga`, say you want to map it to `gh` operator instead:
 
 ```
 let g:chatty_enable_operators = 0
@@ -187,7 +187,7 @@ The `helper#OperatorMapper` is a helper function. The first argument is the oper
 
 ### Usage 2: Ask! (Operator)
 
-Sometimes you don't want to ask questions. Sometimes you want to transform a given text. No problem, you can ask-and-transform it with the `cH` operator.
+Sometimes you don't want to ask questions. Sometimes you want to transform a given text. No problem, you can ask-and-transform it with the `gA` operator.
 
 Below is a lits of a few things you can do with the process operator.
 
@@ -199,7 +199,7 @@ If you have the following text:
 she sells seashells on the seashore
 ```
 
-To titlecase it, with your cursor at the start of the line, run `cHH` to perform a line-wise `ChattyAsk!` operator. Immediately after, a prompt will come up on the cmdline (bottom of your Vim window).
+To titlecase it, with your cursor at the start of the line, run `gAA` to perform a line-wise `ChattyAsk!` operator. Immediately after, a prompt will come up on the cmdline (bottom of your Vim window).
 
 ```
 Prompt:
@@ -225,7 +225,7 @@ Another example. Suppose that you have this JSON:
 { "meal": "breakfast", "dishes": ["eggs", "bacon", "toast"], "beverage": "coffee" }
 ```
 
-To make it pretty, with your cursor at the start of the row, press `cHH` or `cH$`, then give it the prompt:
+To make it pretty, with your cursor at the start of the row, press `gAA` or `gA$`, then give it the prompt:
 
 ```
 Prompt: Prettify JSON and replace all the meat products with vegetables
@@ -253,7 +253,7 @@ For example, if you want to create a Fizzbuzz code:
 Generate a fizzbuzz code in Ruby. Use recursion
 ```
 
-Type `cHH`. You don't have to type anything for Prompt. Leave it blank. It will replace your original instruction "Generate a Fizzbuzz..." with the actual code!
+Type `gAA`. You don't have to type anything for Prompt. Leave it blank. It will replace your original instruction "Generate a Fizzbuzz..." with the actual code!
 
 ```ruby
 def fizzbuzz_recursive(n)
@@ -287,7 +287,7 @@ For example, if I have the following text:
 Peter Piper picked a peck of pickled peppers.
 A peck of pickled peppers Peter Piper picked.
 If Peter Piper picked a peck of pickled peppers,
-Where’s the peck of pickled peppers Peter Piper picked?
+Where's the peck of pickled peppers Peter Piper picked?
 ```
 
 If my cursor is on the first line and if I run `:.,+3ChattyProcess`, it will take the texts from the current cursor to 3 lines below me then it'll  ask me for a prompt. If I tell it to "uppercase the given text", it will replace it with the uppercased text.
@@ -375,30 +375,30 @@ Chatty only supports openAI right now. Chatty stores the provider information wi
 
 ### Switching History
 
-You can switch history with `:ChattyHistories` (default mapping `<Leader>ch`). Chatty will show a dropdown of all histories in that provider, each history having the format of `HISTORYNAME__HISTORYID`. Recall HISTORYID is a UUID.
+Think of histories as sessions. You can switch history with `:ChattyHistories` (default mapping `<Leader>ah`). Chatty will show a dropdown of all histories in that provider, each history having the format of `HISTORY_NAME`.
 
-When you switch history, Chatty will use that history, for subsequent chat. If in that history you've asked "What is the capital of Brazil?", you can pick up your chat and ask, "What is the biggest city of that city?". It knows that you were talking about Brazil, so it knows what the biggest city is. It picks up where you left off.
+When you switch history, Chatty will use that history from subsequent chat. If in that history you've asked "What is the capital of Brazil?", you can pick up your chat and ask, "What is the biggest city of that city?". It knows that you were talking about Brazil, so it knows what the biggest city is. It picks up where you left off. Chatty histories are basically your chat sessions.
 
 ### Renaming History
 
 Your history name by default is its ID, which is a UUID. So you will see `d71c9e35-668b-4761-af5c-c86b21d6002b__d71c9e35-668b-4761-af5c-c86b21d6002b`, which can be hard to tell what history is this about (without looking at the `histories/` directory. You probably want to have an easier-to-remember name. I mean, what the heck is "d71c9e35..."? Is that the history when I asked about Ruby Procs or when I asked about countries of the world?
 
-This is why you can rename history with `:ChattyRenameHistory`. It will prompt you to enter a new name. Think of it like a nickname. Now you can name one history `"ruby_proc"` and another as `"countries"`.
+This is why you can rename history with `:ChattyRenameHistory` (or `<Leader>ar`). It will prompt you to enter a new name. Think of it like a nickname. Now you can name one history `"ruby_proc"` and another as `"countries"`.
 
 Next time you switch history, you will see:
 
 ```
-ruby_proc__d71c9e35-668b-4761-af5c-c86b21d6002b
-countries__f814af0d-b138-486d-971a-acbfc6b0b4dc
+ruby_proc
+countries
 ```
 
-That's a lot easier to choose from.
+That list is now easy on the eyes!
 
 ### New History
 
 Think of history as chat session. Start a new chat session often. It keeps my token usages low. It also keeps the chat provider to focus on a topic. If I was asking about Ruby Procs, then ActiveRecord queries, then Netflix architecture, then countries of the world all in one history, your chat provider may start giving unfocused answer. For that reason, I prefer to have a session for Ruby Procs, another for ActiveRecord queries, another for Netflix architecture (system design), and another for countries of the world. If I need to go back-and-forth between Ruby Procs and ActiveRecord queries, I can just toggle histories.:w
 
-For that reason, create a new history often. By default you can do it with `<Leader>cn` or `:ChattyNewHistory`.
+For that reason, create a new history often. By default you can do it with `<Leader>an` or `:ChattyNewHistory`.
 
 Note: each time you start Vim, Chatty starts a new history.
 
@@ -442,7 +442,7 @@ Now when you start Vim, chatty will use `ruby_developer` as default instruction
 
 ### Switching Instructions
 
-Once you create multiple instructions, you can switch between any instructions. The default is `<Leader>ci` or `:ChattyInstructions`. 
+Once you create multiple instructions, you can switch between any instructions. The default is `<Leader>ai` or `:ChattyInstructions`. 
 
 Note: when you switch an instruction, Chatty will start a new history.
 

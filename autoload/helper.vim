@@ -91,9 +91,6 @@ function! helper#Popup(list, f = 'test_null_function')
   function! PopupCallback(id, result) closure
     if a:result != -1
       let l:selection = l:list[a:result-1]
-      echom '*****'
-      echom l:selection
-      echom a:f
       call function(a:f)(l:selection)
     endif
   endfunction

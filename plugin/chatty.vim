@@ -20,29 +20,34 @@ command! ChattyInstructions call helper#Popup('instruction#List', 'instruction#P
 command! ChattyHistories call helper#Popup('history#List', 'history#PopupCallBack')
 command! ChattyRenameHistory call history#Rename()
 command! ChattyNewHistory call history#Init() | call history#Create() | echom 'New history created!'
+command! ChattyStats call stats#Display()
 
 command! -range -bar -bang ChattyAsk call chatty#AskCommand(<line1>, <line2>, <bang>0)
 command! -nargs=1 ChattyQF call qf#ChattyQF(<q-args>)
 
 " If user sets g:chatty_enable_operators = 0, skip keymaps
 if get(g:, 'chatty_enable_operators', 1)
-  call helper#OperatorMapper('ch', 'chatty#Ask')
-  call helper#OperatorMapper('cH', 'chatty#AskBang')
+  call helper#OperatorMapper('ga', 'chatty#Ask')
+  call helper#OperatorMapper('gA', 'chatty#AskBang')
 endif
 
 if get(g:, 'chatty_enable_instructions_mapping', 1)
-  nnoremap <Leader>ci :ChattyInstructions<CR>
+  nnoremap <Leader>ai :ChattyInstructions<CR>
 endif
 
 if get(g:, 'chatty_enable_rename_history_mapping', 1)
-  nnoremap <Leader>cr :ChattyRenameHistory<CR>
+  nnoremap <Leader>ar :ChattyRenameHistory<CR>
 endif
 
 if get(g:, 'chatty_enable_histories_mapping', 1)
-  nnoremap <Leader>ch :ChattyHistories<CR>
+  nnoremap <Leader>ah :ChattyHistories<CR>
 endif
 
 if get(g:, 'chatty_enable_new_history_mapping', 1)
-  nnoremap <Leader>cn :ChattyNewHistory<CR>
+  nnoremap <Leader>an :ChattyNewHistory<CR>
+endif
+
+if get(g:, 'chatty_enable_stats_mapping', 1)
+  nnoremap <Leader>as :ChattyStats<CR>
 endif
 
