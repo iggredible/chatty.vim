@@ -79,8 +79,6 @@ function! history#Push(type = '')
     let l:history += [l:response]
   endif
 
-  " When running history#Push('prompt'), what does g:chatty_history look like?
-  " Does it have prompt?
   let g:chatty_history = json_encode(l:history)
 endfunction
 
@@ -144,9 +142,8 @@ function! history#List()
       try
         let l:json = json_decode(join(l:content, ''))
         let l:name = get(l:json, 'name', '')
-        let l:id = get(l:json, 'id', '')
-        if !empty(l:name) && !empty(l:id)
-          call add(l:result, l:name .. '__' .. l:id)
+        if !empty(l:name)
+          call add(l:result, l:name)
         endif
       catch
         " Skip invalid JSON files
@@ -158,10 +155,26 @@ function! history#List()
   return l:result
 endfunction
 
-function! history#PopupCallBack(history_name_id)
-  let [l:history_name, l:history_id] = split(a:history_name_id, '__')
+function! history#PopupCallBack(history_name)
+  let l:history_dir_path = g:chatty_dir_path .. '/histories/' .. g:chatty_provider
+  let l:files = glob(l:history_dir_path . '/*.json', 0, 1)
 
-  call history#Update(l:history_id)
+  for l:file in l:files
+    let l:content = readfile(l:file)
+    if !empty(l:content)
+      try
+        let l:json = json_decode(join(l:content, ''))
+        let l:name = get(l:json, 'name', '')
+        if a:history_name == l:name
+          let l:id = l:json.id
+        endif
+      endtry
+    endif
+  endfor
+
+  if !empty(l:id)
+    call history#Update(l:id)
+  endif
 endfunction
 
 function! history#Update(history_id)
