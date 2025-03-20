@@ -2,6 +2,28 @@ function! helper#GenerateUUID()
   return py3eval('__import__("uuid").uuid4().__str__()')
 endfunction
 
+function! helper#PrettyJSON()
+  let l:save_cursor = getpos(".")
+
+  " Try python3 json tool
+  silent! %!python3 -m json.tool
+
+  " Fallback: jq command
+  if v:shell_error
+    silent! %!jq .
+  endif
+
+  " If all formatters fail, show error
+  if v:shell_error
+    echo "Error formatting JSON. Make sure python or jq is installed."
+    return
+  endif
+
+  call setpos('.', l:save_cursor)
+
+  echo "JSON formatted successfully."
+endfunction
+
 function! helper#Operator(f = 'test_null_function', context = {}, type = '') abort
   if a:type == ''
     let context = #{
