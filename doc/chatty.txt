@@ -324,9 +324,9 @@ Note: Switching instructions starts a new history.
 
 Quickly access histories, instructions, and configs using the `:ChattyQF` command:
 
-    :ChattyQF -h     " or :ChattyQF --history
-    :ChattyQF -i     " or :ChattyQF --instruction
-    :ChattyQF -c     " or :ChattyQF --config
+    :ChattyQF history
+    :ChattyQF instruction
+    :ChattyQF config
 
 This opens a quickfix list showing all items of the specified type. Selecting 
 an item opens the corresponding file for viewing or editing.
@@ -360,7 +360,7 @@ an item opens the corresponding file for viewing or editing.
 
 *:ChattyQF* {option}                                          *:ChattyQF*
     Opens a quickfix list with histories, instructions, or configs.
-    Options: -h/--history, -i/--instruction, -c/--config
+    Options: history, instruction, config
     Allows for quick navigation and editing of Chatty files.
 
 ===============================================================================

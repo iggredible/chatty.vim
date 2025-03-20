@@ -23,7 +23,7 @@ command! ChattyNewHistory call history#Init() | call history#Create() | echom 'N
 command! ChattyStats call stats#Display()
 
 command! -range -bar -bang ChattyAsk call chatty#AskCommand(<line1>, <line2>, <bang>0)
-command! -nargs=1 ChattyQF call qf#ChattyQF(<q-args>)
+command! -nargs=1 -complete=customlist,qf#ChattyQFCompletion ChattyQF call qf#ChattyQF(<q-args>)
 
 " If user sets g:chatty_enable_operators = 0, skip keymaps
 if get(g:, 'chatty_enable_operators', 1)

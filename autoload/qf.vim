@@ -1,16 +1,20 @@
 function! qf#ChattyQF(arg)
-  if a:arg == '-h' || a:arg == '--history'
+  if a:arg == 'history'
     call qf#Histories()
-  elseif a:arg == '-i' || a:arg == '--instruction'
+  elseif a:arg == 'instruction'
     call qf#Instructions()
-  elseif a:arg == '-c' || a:arg == '--config'
+  elseif a:arg == 'config'
     call qf#Configs()
   else
     echo "Invalid argument. Available options:"
-    echo "  -h, --history     : Show chat histories"
-    echo "  -i, --instruction : Show instructions"
-    echo "  -c, --config      : Show configurations"
+    echo "  history     : Show chat histories"
+    echo "  instruction : Show instructions"
+    echo "  config      : Show configurations"
   endif
+endfunction
+
+function! qf#ChattyQFCompletion(ArgLead, CmdLine, CursorPos)
+  return filter(['history', 'instruction', 'config'], 'v:val =~ "^' . a:ArgLead . '"')
 endfunction
 
 function! qf#Instructions()

@@ -448,12 +448,12 @@ Note: when you switch an instruction, Chatty will start a new history.
 
 ## Quick(fix) Access to Config, History, and Instruction
 
-You can quickly see all histories, instructions, and configs quickfix list with the `:ChattyQF -OPTS` command, where `OPTS` represent either history / instruction / config and their longhand:
+You can quickly see all histories, instructions, and configs quickfix list with the `:ChattyQF OPTS` command, where `OPTS` represent either history / instruction / config and their longhand:
 
 ```
-:ChattyQF -h " or :ChattyQF --history
-:ChattyQF -i " or :ChattyQF --instruction
-:ChattyQF -c " or :ChattyQF --config
+:ChattyQF history
+:ChattyQF instruction
+:ChattyQF config
 ```
 
 It will open a quickfix that lists all histories / instructions / configs. When you choose one of them, it will take you to that file so you can read / configure it.
