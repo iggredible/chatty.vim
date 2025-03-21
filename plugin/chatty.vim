@@ -27,6 +27,8 @@ command! -nargs=1 -complete=customlist,qf#ChattyQFCompletion ChattyQF call qf#Ch
 
 command! PrettyJSON call helper#PrettyJSON()
 
+command! -nargs=1 -complete=customlist,chatty#get#git#Completion ChattyGetGit call chatty#get#git(<q-args>)
+
 " If user sets g:chatty_enable_operators = 0, skip keymaps
 if get(g:, 'chatty_enable_operators', 1)
   call helper#OperatorMapper('ga', 'chatty#Ask')

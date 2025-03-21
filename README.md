@@ -458,6 +458,13 @@ You can quickly see all histories, instructions, and configs quickfix list with 
 
 It will open a quickfix that lists all histories / instructions / configs. When you choose one of them, it will take you to that file so you can read / configure it.
 
+## Git (TODO)
+
+Any `git diff` operation should work:
+- `:ChattyGetGit diff`
+- `:ChattyGetGit diff -- some/file.rb`
+- `:ChattyGetGit diff main..feature_branch`
+
 # Alternatives
 
 There are other Vim AI plugins out there:
