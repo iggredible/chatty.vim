@@ -1,3 +1,30 @@
+function! helper#ReadFile(path)
+  let l:path = expand(a:path)
+  if !filereadable(l:path)
+    return []
+  endif
+  let l:lines = readfile(l:path)
+
+  " Remove empty lines
+  return filter(l:lines, 'v:val !~ "^\\s*$"')
+endfunction
+
+function! helper#ReadDirectory(path)
+  let file_paths = glob(expand(a:path) .. '*', 0, 1)
+  let base_names = []
+
+  for path in file_paths
+    " Skip directories
+    if !isdirectory(path)
+      " Extract filename without path (:t) and without extension (:r)
+      let base_name = fnamemodify(path, ':t:r')
+      call add(base_names, base_name)
+    endif
+  endfor
+
+  return base_names
+endfunction
+
 function! helper#GenerateUUID()
   return py3eval('__import__("uuid").uuid4().__str__()')
 endfunction

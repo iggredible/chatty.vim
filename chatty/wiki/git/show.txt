@@ -1,0 +1,11 @@
+HEAD
+HEAD~2
+--name-only
+--name-status
+--stat
+--patch
+--no-patch
+--no-notes
+--oneline
+--summary
+--word-diff

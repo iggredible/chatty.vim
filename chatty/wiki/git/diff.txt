@@ -1,0 +1,5 @@
+BRANCH1..BRANCH2
+commit1 commit2
+HEAD~5 HEAD~2
+--staged
+-- path/to/file

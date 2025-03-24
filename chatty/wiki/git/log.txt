@@ -1,0 +1,7 @@
+--stat
+--since="date"
+--until="date'
+--grep="pattern"
+--merges
+--no-merges--graph
+--oneline
