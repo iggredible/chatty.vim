@@ -2,6 +2,8 @@
 --since="date"
 --until="date'
 --grep="pattern"
+-- %
 --merges
 --no-merges--graph
 --oneline
+-S "pattern"
