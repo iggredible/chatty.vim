@@ -25,6 +25,8 @@ command! ChattyStats call stats#Display()
 command! -range -bar -bang ChattyAsk call chatty#AskCommand(<line1>, <line2>, <bang>0)
 command! -nargs=1 -complete=customlist,qf#ChattyQFCompletion ChattyQF call qf#ChattyQF(<q-args>)
 
+command! -range LangchainCodes call langchain#Codes(<line1>, <line2>)
+
 command! PrettyJSON call helper#PrettyJSON()
 
 command! -nargs=1 -complete=customlist,chatty#get#git#Completion ChattyGetGit call chatty#get#git(<q-args>)
