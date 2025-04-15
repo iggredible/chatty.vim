@@ -26,6 +26,7 @@ command! -range -bar -bang ChattyAsk call chatty#AskCommand(<line1>, <line2>, <b
 command! -nargs=1 -complete=customlist,qf#ChattyQFCompletion ChattyQF call qf#ChattyQF(<q-args>)
 
 command! -range LangchainCodes call langchain#Codes(<line1>, <line2>)
+command! -range LC call langchain#get#codes#run(<line1>, <line2>)
 
 command! PrettyJSON call helper#PrettyJSON()
 

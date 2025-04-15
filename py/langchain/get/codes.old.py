@@ -32,7 +32,6 @@ from langchain_openai import OpenAI  # Updated import
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 
-def 
 def partition_codes(code_snippet, file_name, entire_file_code):
     prompt = PromptTemplate(
         input_variables=["code", "file_name", "entire_file_code"],
@@ -137,4 +136,3 @@ def analyze_code(code_snippet, file_name, entire_file_code):
 # # analyze_code(original_file_path, code_snippet)
 
 partition_codes(code_snippet, original_file_path, entire_file_code)
-
